@@ -231,7 +231,7 @@
 		</dependency>
 	</dependencies>
 	<issueManagement>
-		<url>www.iliketomovies.com/buggenie</url>
-		<system>thebuggenie</system>
+		<url>https://github.com/semfacet/core/issues</url>
+		<system>github</system>
 	</issueManagement>
 </project>
