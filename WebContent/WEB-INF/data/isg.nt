@@ -1,0 +1,164 @@
+<http://cs.ox.ac.uk/Ana_Armas> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Boris_Motik> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Robert_Piro> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://cs.ox.ac.uk/person> .
+<http://cs.ox.ac.uk/Ana_Armas> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/ana.armas/> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/andrew.bate/> .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/bernardo.cuencagrau/> .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/cristina.feier/> .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/ian.horrocks/> .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/ernesto.jimenez-ruiz/> .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/mark.kaminski/> .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/evgeny.kharlamov/> .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/sarunas.marciuska/> .
+<http://cs.ox.ac.uk/Boris_Motik> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/boris.motik/> .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/yavor.nenov/> .
+<http://cs.ox.ac.uk/Robert_Piro> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/robert.piro/> .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/anthony.potter/> .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/giorgio.stefanoni/> .
+<Dmitriy_Zheleznyakov> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/dmitriy.zheleznyakov/> .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/yujiao.zhou/> .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://xmlns.com/foaf/0.1/homepage> <http://www.cs.ox.ac.uk/people/egor.kostylev/> .
+<http://cs.ox.ac.uk/Ana_Armas> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/4241//AnaArmas.png> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/5003//RYP_14_800_800.jpg> .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/3985//bernardo.jpg> .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/5442//Cristina%20Feier.jpg> .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/2031//IH005-1.jpg> .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/3707//ernesto.Jjimenez-ruiz.jpg> .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/5304//SGSCS_Pola_193_a_cr.jpg> .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/3928//evgeny.kharlamov.gif> .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/6305//sarunas.jpg> .
+<http://cs.ox.ac.uk/Boris_Motik> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/112//boris.png> .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/5072//yavor.nenov.jpg> .
+<http://cs.ox.ac.uk/Robert_Piro> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/4276//robert_piro.jpg> .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/5858//Potter%20Anthony.jpg> .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/images/notavailable.gif> .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/5293//dmitriy_zheleznyakov_72.jpg> .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/files/4772//avatar.jpg> .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://dbpedia.org/ontology/thumbnail> <http://www.cs.ox.ac.uk/images/notavailable.gif> .
+<http://cs.ox.ac.uk/Ana_Armas> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Doctoral_Student> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Doctoral_Student> .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Associate_Professor> .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Research_Assistant> .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Professor> .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Research_Assistant> .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Research_Assistant> .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Senior_Research_Fellow> .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Research_Assistant> .
+<http://cs.ox.ac.uk/Boris_Motik> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Professor> .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Research_Assistant> .
+<http://cs.ox.ac.uk/Robert_Piro> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Research_Assistant> .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Doctoral_Student> .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Doctoral_Student> .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Research_Assistant> .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Doctoral_Student> .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://cs.ox.ac.uk/hasRole> <http://cs.ox.ac.uk/Departmental_Lecturer> .
+<http://cs.ox.ac.uk/Ana_Armas> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/311> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/309> .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/305> .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/307> .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/304> .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/306> .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/307> .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/306> .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/306> .
+<http://cs.ox.ac.uk/Boris_Motik> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/308> .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/309> .
+<http://cs.ox.ac.uk/Robert_Piro> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/309> .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/309> .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/311> .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/306> .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/311> .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://cs.ox.ac.uk/staysInOffice> <http://cs.ox.ac.uk/322> .
+<http://cs.ox.ac.uk/Ana_Armas> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> .
+<http://cs.ox.ac.uk/Ana_Armas> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Ian_Horrocks> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Ian_Horrocks> .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Boris_Motik> .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Boris_Motik> .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Ian_Horrocks> .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Boris_Motik> .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://cs.ox.ac.uk/supervisedBy> <http://cs.ox.ac.uk/Ian_Horrocks> .
+<http://cs.ox.ac.uk/Ana_Armas> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Boris_Motik> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Robert_Piro> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://www.w3.org/2000/01/rdf-schema#comment> " random description " .
+<http://cs.ox.ac.uk/Ana_Armas> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759765" .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759727" .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759800" .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759803" .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759858" .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759736" .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759788" .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759756" .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759751" .
+<http://cs.ox.ac.uk/Boris_Motik> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759778" .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759753" .
+<http://cs.ox.ac.uk/Robert_Piro> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759712" .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759739" .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759790" .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759770" .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759753" .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://www.w3.org/2003/01/geo/wgs84_pos#lat> "51.759680" .
+<http://cs.ox.ac.uk/Ana_Armas> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258442" .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258319" .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258192" .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258273" .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258208" .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258283" .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258337" .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258315" .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258245" .
+<http://cs.ox.ac.uk/Boris_Motik> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258396" .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258334" .
+<http://cs.ox.ac.uk/Robert_Piro> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258394" .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258396" .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258453" .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258282" .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258430" .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://www.w3.org/2003/01/geo/wgs84_pos#long> "-1.258560" .
+<http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#label> "type" .
+<http://cs.ox.ac.uk/Ana_Armas> <http://www.w3.org/2000/01/rdf-schema#label> "Ana Armas" .
+<http://cs.ox.ac.uk/Andrew_Bate> <http://www.w3.org/2000/01/rdf-schema#label> "Andrew Bate" .
+<http://cs.ox.ac.uk/Bernardo_Cuenca_Grau> <http://www.w3.org/2000/01/rdf-schema#label> "Bernardo Cuenca Grau" .
+<http://cs.ox.ac.uk/Cristina_Feier> <http://www.w3.org/2000/01/rdf-schema#label> "Cristina Feier" .
+<http://cs.ox.ac.uk/Ian_Horrocks> <http://www.w3.org/2000/01/rdf-schema#label> "Ian Horrocks" .
+<http://cs.ox.ac.uk/Ernesto_Jimenez-Ruiz> <http://www.w3.org/2000/01/rdf-schema#label> "Ernesto Jimenez-Ruiz" .
+<http://cs.ox.ac.uk/Mark_Kaminski> <http://www.w3.org/2000/01/rdf-schema#label> "Mark Kaminski" .
+<http://cs.ox.ac.uk/Evgeny_Kharlamov> <http://www.w3.org/2000/01/rdf-schema#label> "Evgeny Kharlamov" .
+<http://cs.ox.ac.uk/Sarunas_Marciuska> <http://www.w3.org/2000/01/rdf-schema#label> "Sarunas Marciuska" .
+<http://cs.ox.ac.uk/Boris_Motik> <http://www.w3.org/2000/01/rdf-schema#label> "Boris Motik" .
+<http://cs.ox.ac.uk/Yavor_Nenov> <http://www.w3.org/2000/01/rdf-schema#label> "Yavor Nenov" .
+<http://cs.ox.ac.uk/Robert_Piro> <http://www.w3.org/2000/01/rdf-schema#label> "Robert Piro" .
+<http://cs.ox.ac.uk/Anthony_Potter> <http://www.w3.org/2000/01/rdf-schema#label> "Anthony Potter" .
+<http://cs.ox.ac.uk/Giorgio_Stefanoni> <http://www.w3.org/2000/01/rdf-schema#label> "Giorgio Stefanoni" .
+<http://cs.ox.ac.uk/Dmitriy_Zheleznyakov> <http://www.w3.org/2000/01/rdf-schema#label> "Dmitriy Zheleznyakov" .
+<http://cs.ox.ac.uk/Yujiao_Zhou> <http://www.w3.org/2000/01/rdf-schema#label> "Yujiao Zhou" .
+<http://cs.ox.ac.uk/Egor_Kostylev> <http://www.w3.org/2000/01/rdf-schema#label> "Egor Kostylev" .
