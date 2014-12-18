@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+	<meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>SemFacet Manager</title>
+  <link rel="shortcut icon" href="Client/img/favicon.ico" type="image/x-icon" />
+  
+  <link rel="stylesheet" href="Client/css/foundation.css" />
+  
+
+  <script src="Client/js/vendor/custom.modernizr.js"></script>
+  
+  <style type="text/css">
+	  .show-page{
+	  	display:block;
+	  }
+	  .hide-page{
+	  	display:none;
+	  }
+	  .selected-acordion {
+	  	font-weight:bold;
+	  }
+	  .center_loader {
+	  	position:fixed;
+	    top: 200px;
+	    left: 50%;
+	    z-index:100;
+	  }
+  </style>
+
+</head>
+<body>
+	<!-- Header and Nav -->
+  	<div class="row" style="margin-top:20px;">
+  		<div class="large-6 columns">
+	     	<img src="Client/img/SemFacet.png" style="display: block; margin-bottom:10px; height:20px; float:left" /> 
+	     	<span style="color:#1B7488; font-size:12px; font-weight:600; margin-left:10px"> Manager </span>
+	     </div>
+  	</div>
+  	<div class="row" style="margin-top:20px;margin-bottom:100px;">
+        <div class="large-9 push-3 columns">
+        	<!-- Statistics tab -->
+        	<div id="page_statistics_tab" class="show-page">
+        		<div style="background-color: #1B7488; text-align:center; color:white; padding:5px;"> Statistics </div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Number of triples in the triple store:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="statistics_triples">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Number of distinct facets in the triple store:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="statistics_facets">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Memory consumption:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="statistics_memory">
+		  			</div>
+		  		</div>
+        	</div>
+        	<!-- End Statistics tab -->
+
+        	<!-- Active settings tab -->
+        	<div id="page_active_settings_tab" class="hide-page" >
+        		<div style="background-color: #1B7488; text-align:center; color:white; padding:5px;"> Active Settings </div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Max results returned by the keyword search:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_max_results">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet image predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_image">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet url predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_url">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet title predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_title">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet description predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_description">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet extra field 1 predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_extra1">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet extra field 2 predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_extra2">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet extra field 3 predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_extra3">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Initial facet predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_category">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Label predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_label">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Latitude predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_latitude">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Longitude predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_longitude">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Hierarchy predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_hierarchy">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Facet nesting:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_nesting">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Conjunctive facet predicates:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_conjunctive_facets">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Excluded predicates:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_excluded_predicates">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Active triple store:</b>
+		  			</div>
+		  			<div class="large-8 columns" id="active_store_type">
+		  			</div>
+		  		</div>
+        	</div>
+        	<!-- End Active settings tab -->
+
+        	<!-- Update settings tab -->
+        	<div id="page_update_settings_tab" class="hide-page" >
+        		<div style="background-color: #1B7488; text-align:center; color:white; padding:5px;"> Update Settings </div>
+        		<div style="margin-top:20px">
+			  		<div data-alert class="alert-box alert radius" id="update_setting_error">
+			  			<span id = "update_setting_error_info"> </span>
+					</div>
+				</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Max results returned by the keyword search:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<input type="text" style="width:100%;float:left; margin-right:5px;" id="settings_max_results" onkeyup="validateSettings()" />
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet image predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id ="settings_image">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet url predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id ="settings_url">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet title predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id ="settings_title">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet description predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id = "settings_description">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet extra field 1 predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id = "settings_extra1">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet extra field 2 predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id = "settings_extra2">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Snippet extra field 3 predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id = "settings_extra3">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Initial facet predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+						<select style="width:100%;" id = "settings_category">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Label predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id="settings_label">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Latitude predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id="settings_latitude">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Longitude predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id="settings_longitude">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Hierarchy predicate:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<select style="width:100%;" id="settings_hierarchy">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Facet nesting:</b>
+		  			</div>
+		  			<div class="large-8 columns" style="font-size: 12px;">
+		  				<input type="radio" name="nesting" value="true" id="enabled_nesting" style="margin-right:10px;" > enabled
+		  				<input type="radio" name="nesting" value="false" id="disabled_nesting" style="margin-right:10px;margin-left:10px;">disabled
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Conjunctive facet predicates:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+						<select multiple style="width:100%; float:left; margin-right:5px;" id ="settings_conjunctive_facets">
+						</select>
+		  			</div>
+		  		</div>
+				<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Excluded predicates:</b>
+		  			</div>
+		  			<div class="large-8 columns">
+						<select multiple style="width:100%; float:left; margin-right:5px;" id ="settings_excluded_predicates">
+						</select>
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<input type="button" value="update" onclick="setConfigurations()"/>
+		  			</div>
+		  		</div>
+		  		<div style="margin-top:20px">
+		  			<div data-alert class="alert-box success radius" id="update_setting_success">
+		  				<span id = "update_setting_success_info"> </span>
+					</div>
+		  		</div>
+        	</div>
+        	<!-- End Update settings tab -->
+
+        	<!-- Load data tab -->
+        	<div id="page_load_data_tab" class="hide-page" >
+        		<div style="background-color: #1B7488; text-align:center; color:white; padding:5px;"> Load data </div>
+        		<div class="row" style="margin-top:20px;">
+        			<div class="large-4 columns">
+		  				<b>Upload ontology (owl): </b>
+		  			</div>
+		  			<div class="large-8 columns">
+		  				<input type="file" id ="ontologyFileToUpload"/>
+		  			</div>
+		  			<div class="large-4 columns">
+		  				<b>Upload data (triples): </b>
+		  			</div>
+		  			<div class="large-8 columns">
+		    			<input type="file" id ="dataFileToUpload"/>
+
+		  				<input type="radio" name="storeType" value="JRDFOX" id="store_jrdfox" style="margin-right:10px;"> JRDFOX
+		  				<input type="radio" name="storeType" value="PAGODA" id="store_pagoda" style="margin-left:10px;"> PAGODA
+		  				<input type="radio" name="storeType" value="SESAME" id="store_sesame" style="margin-left:10px;"> SESAME
+		  				<input type="radio" name="storeType" value="HERMIT" id="store_hermit" style="margin-left:10px;"> HERMIT
+		  				</br>
+						<progress id="upload_file_progress"></progress>
+						<span id ="upload_file_info">Uploading ...</span>
+						<input type="button" value="Upload" onclick="uploadData()" id="file_upload_button"/>
+		  			</div>
+		  		</div>
+		  		<div style="margin-top:20px">
+		  			<div data-alert class="alert-box success radius" id="load_data_success">
+		  				<span id = "load_data_success_info"> </span>
+					</div>
+			  		<div data-alert class="alert-box alert radius" id="load_data_error">
+			  			<span id = "load_data_error_info"> </span>
+					</div>
+				</div>
+        	</div>
+        	<!-- End Load data tab -->
+
+        	<!-- Load data tab -->
+        	<div id="page_data_preview_tab" class="hide-page" >
+        		<div id="preloader"><img src="Client/img/ajax-loader.gif" class="center_loader"/></div>
+        		<div style="background-color: #1B7488; text-align:center; color:white; padding:5px;"> Data Preview </div>
+        		<table id="data_preview" style="margin-top:5px;">
+  					<thead>
+    					<tr>
+      						<th width="200" >Subject</th>
+      						<th width="200" >Predicate</th>
+      						<th>Object</th>
+    					</tr>
+  					</thead>
+ 					<tbody>
+ 					</tbody>
+ 				</table>
+        	</div>
+        	<!-- End Load data tab -->
+        </div>
+
+        <div class="large-3 pull-9 columns">
+    	     <div class="section-container accordion " data-section="accordion" data-options="one_up: false;">
+    		      <section id ="statistics_tab" class="active" >
+    		        <p class="title" data-section-title onclick="toggleMenu(this);" ><a href="#">Statistics</a></p>
+    		      </section>
+    		      <section id ="active_settings_tab">
+    		    	<p class="title" data-section-title onclick="toggleMenu(this);"><a href="#">Active settings</a></p>
+    		      </section>
+    		      <section id ="data_preview_tab">
+    		    	<p class="title" data-section-title onclick="toggleMenu(this);"><a href="#">Data Preview</a></p>
+    		      </section>
+    		      <section id="update_settings_tab">
+    		        <p class="title" data-section-title onclick="toggleMenu(this);"><a href="#">Update settings</a></p>
+    		     </section>
+    		     <section id="load_data_tab">
+    		        <p class="title" data-section-title onclick="toggleMenu(this);"><a href="#">Load data</a></p>
+    		     </section>
+    		     <section>
+    		     	<p class="title" data-section-title> <a href="index.html">SemFacet Search</a></p>
+    		     </section>
+    	     </div>
+      	</div>
+  	</div>
+
+  
+  <!-- End Header and Nav -->
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'Client/js/vendor/zepto' : 'Client/js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="Client/js/foundation.min.js"></script>
+   
+  <script>
+    $(document).foundation();
+
+    var CURRENT_PAGE = "#page_statistics_tab";
+  	var SERVER_URL = "http://localhost:8080/semFacet/rest/WebService/";
+
+    $(function() {
+    	$("#upload_file_progress").hide();
+    	$("#upload_file_info").hide();
+    	$("#preloader").hide();
+    	hideInfoBoxes();
+    	getConfigurations();
+	});
+
+	hideInfoBoxes = function() {
+		$("#load_data_success").hide();
+    	$("#load_data_error").hide();
+    	$("#update_setting_success").hide();
+    	$("#update_setting_error").hide();    	
+	}
+
+	toggleMenu = function(element) {
+		$("section").removeClass("active");
+		$(element).parent().addClass("active");
+		id = $(element).parent().attr("id");
+		navigateMenu(id, false );
+	}
+	
+	navigateMenu = function(id){
+		$(CURRENT_PAGE).removeClass("show-page");
+		$(CURRENT_PAGE).addClass("hide-page");
+		$("#page_"+id).removeClass("hide-page");
+		$("#page_"+id).addClass("show-page");
+		CURRENT_PAGE="#page_"+id;
+		hideInfoBoxes();
+		switch (id){
+	  		case "statistics_tab": 
+	  			getConfigurations();
+	            break;
+	  		case "active_settings_tab": 
+	  			getConfigurations();
+	            break;
+	  		case "update_settings_tab":
+	  			getConfigurations();
+	            break;
+	        case "data_preview_tab":
+	        	$("#preloader").show();
+	        	getDataPreview();
+	        	break;
+	  		default:  break;
+		}
+		
+	}
+
+    getConfigurations = function () {
+      cleanDropBoxes();
+      $.getJSON(SERVER_URL+"getConfigurations", { }, function(data) {
+          try {            
+            $("#statistics_triples").html(data.allTriples);
+            $("#statistics_facets").html(data.allPredicates.length);
+            $("#statistics_memory").html(data.memory);
+
+          	$("#active_max_results").html(data.maxSearchResuls);
+	        $("#active_image").html(data.snippetImagePredicate);
+	        $("#active_url").html(data.snippetURLPredicate);
+	        $("#active_title").html(data.snippetTitlePredicate);   
+	        $("#active_description").html(data.snippetDescriptionPredicate);  
+	        $("#active_extra1").html(data.snippetExtra1Predicate);
+	        $("#active_extra2").html(data.snippetExtra2Predicate);
+	        $("#active_extra3").html(data.snippetExtra3Predicate);   
+          	$("#active_category").html(data.categoryPredicate);
+          	$("#active_label").html(data.labelPredicate);
+          	$("#active_hierarchy").html(data.hierarchyPredicate); 
+          	if (data.nesting) {
+          		$("#active_nesting").html("enabled");
+          		$("#enabled_nesting").prop("checked", true);
+          	}
+          	else {
+          		$("#active_nesting").html("disabled");
+          		$("#disabled_nesting").prop("checked", true);
+          	}
+          	$("#active_conjunctive_facets").html(data.conjunctivePredicates.join(", "));
+          	$("#active_excluded_predicates").html(data.excludedPredicates.join(", "));
+          	$("#active_longitude").html(data.longitudePredicate);
+          	$("#active_latitude").html(data.latitudePredicate);
+          	$("#active_store_type").html(data.storeType);
+          	if (data.storeType == "JRDFOX") {
+          		$("#store_jrdfox").prop("checked", true);
+          	} else if (data.storeType == "PAGODA") {
+          		$("#store_pagoda").prop("checked", true);
+          	} else if (data.storeType == "SESAME") {
+          		$("#store_sesame").prop("checked", true);
+          	} else if (data.storeType == "HERMIT") {
+          		$("#store_hermit").prop("checked", true);
+          	}
+
+          	$("#settings_max_results").val(data.maxSearchResuls);
+          	populateDropBox("#settings_image", data.allPredicates, data.snippetImagePredicate);
+          	populateDropBox("#settings_url", data.allPredicates, data.snippetURLPredicate);
+          	populateDropBox("#settings_title", data.allPredicates, data.snippetTitlePredicate);
+          	populateDropBox("#settings_description", data.allPredicates, data.snippetDescriptionPredicate);
+          	populateDropBox("#settings_extra1", data.allPredicates, data.snippetExtra1Predicate);
+          	populateDropBox("#settings_extra2", data.allPredicates, data.snippetExtra2Predicate);
+          	populateDropBox("#settings_extra3", data.allPredicates, data.snippetExtra3Predicate);
+          	populateDropBox("#settings_category", data.allPredicates, data.categoryPredicate);
+          	populateDropBox("#settings_label", data.allPredicates, data.labelPredicate);
+          	populateDropBox("#settings_latitude", data.allPredicates, data.latitudePredicate);
+          	populateDropBox("#settings_longitude", data.allPredicates, data.longitudePredicate);
+          	populateDropBox("#settings_hierarchy", data.allPredicates, data.hierarchyPredicate);
+          	populateDropBox("#settings_conjunctive_facets", data.allPredicates, data.conjunctivePredicates);
+          	populateDropBox("#settings_excluded_predicates", data.allPredicates, data.excludedPredicates);
+
+          } catch (err) {
+          	
+          }
+      });  
+    }
+
+    cleanDropBoxes = function () {
+    	$("#settings_image").empty();
+    	$("#settings_url").empty();
+    	$("#settings_title").empty();
+    	$("#settings_description").empty();
+    	$("#settings_extra1").empty();
+    	$("#settings_extra2").empty();
+    	$("#settings_extra3").empty();
+    	$("#settings_category").empty();
+    	$("#settings_label").empty();
+    	$("#settings_latitude").empty();
+    	$("#settings_longitude").empty();
+    	$("#settings_hierarchy").empty();
+    	$("#settings_conjunctive_facets").empty();
+    	$("#settings_excluded_predicates").empty();
+    }
+
+    populateDropBox = function (id, result, selected) {
+    	var options = $(id);
+		for (var i = 0; i < result.length; i++)
+			options.append($("<option />").val(result[i]).text(result[i]));
+		if ($.isArray(selected)) {
+			for (var i = 0; i < selected.length; i++)
+				options.val(selected[i]);
+		} else {
+			options.val(selected);
+		}
+    }
+
+    setConfigurations = function () {
+      hideInfoBoxes();
+      validateSettings();
+      $.getJSON(SERVER_URL+"setConfigurations", 
+      	{max: $("#settings_max_results").val(),
+      	 image: $("#settings_image").val(),
+      	 url: $("#settings_url").val(),
+      	 title: $("#settings_title").val(),
+      	 description: $("#settings_description").val(),
+      	 extra1: $("#settings_extra1").val(),
+      	 extra2: $("#settings_extra2").val(),
+      	 extra3: $("#settings_extra3").val(),
+      	 category: $("#settings_category").val(),
+      	 label: $("#settings_label").val(),
+      	 latitude: $("#settings_latitude").val(),
+      	 longitude: $("#settings_longitude").val(),
+      	 hierarchy: $("#settings_hierarchy").val(),
+      	 conjunctive_predicates: $("#settings_conjunctive_facets").val().join(","),
+      	 excluded_predicates: $("#settings_excluded_predicates").val().join(","),
+      	 nesting: $("#enabled_nesting").is(":checked")}, function(data) {
+      	 	if (data.success!=null) {
+	        	$("#update_setting_success").show();
+	        	$("#update_setting_success_info").text(data.success);
+	        } else if (data.error!=null){
+				$("#update_setting_error").show();
+	        	$("#update_setting_error_info").text(data.error);
+	        }
+      		getConfigurations();
+      });  
+    }
+
+	uploadData = function(){
+		hideInfoBoxes();
+		$("#file_upload_button").attr("disabled", "disabled");
+		var data = new FormData();    
+		var dataFileLoaded = false;
+		var ontologyFileLoaded = false;
+
+		$.each($("#dataFileToUpload")[0].files, function(i, file) {
+    		data.append("data_file", file);
+    		dataFileLoaded = true;
+		});
+
+		$.each($("#ontologyFileToUpload")[0].files, function(i, file) {
+    		data.append("ontology_file", file);
+    		ontologyFileLoaded = true;
+		});
+
+		if (!dataFileLoaded)
+			data.append("data_file", "");
+		if (!ontologyFileLoaded)
+			data.append("ontology_file", "");
+		
+		var selectedVal = "";
+		var selected = $("input[type='radio'][name='storeType']:checked");
+		if (selected.length > 0) {
+    		selectedVal = selected.val();
+		}
+		
+		data.append("store_type", selectedVal);
+
+	    $.ajax({
+	        url: SERVER_URL+"uploadData",
+	        type: 'POST',
+	        xhr: function() {
+	            var myXhr = $.ajaxSettings.xhr();
+	            if(myXhr.upload){ 
+	            	$("#upload_file_progress").show();
+	                myXhr.upload.addEventListener('progress',progressHandlingFunction, false);
+	            }
+	            return myXhr;
+	        },
+	        success: function(data) {
+	        	$("#upload_file_info").hide();
+	        	$("#file_upload_button").removeAttr("disabled");
+	        	if (data.success!=null) {
+	        		$("#load_data_success").show();
+	        		$("#load_data_success_info").text(data.success);
+	        	} else if (data.error!=null){
+	        		$("#load_data_error").show();
+	        		$("#load_data_error_info").text(data.error);
+	        	}
+	        	getConfigurations();
+	        },
+	        data: data,
+	        cache: false,
+    		contentType: false,
+    		processData: false
+	    });
+	}
+
+	progressHandlingFunction = function(e){
+    	if(e.lengthComputable)
+        	$('progress').attr({value:e.loaded,max:e.total});
+        if (e.loaded == e.total) {
+        	$("#upload_file_progress").hide();
+        	$("#upload_file_info").show();
+        }
+	}
+
+	validateSettings = function(){
+		hideInfoBoxes();
+		if (!isPositiveInteger($("#settings_max_results").val())) {
+			$("#update_setting_error").show();
+	        $("#update_setting_error_info").text("Max search result must be a possitive integer.");
+		}
+	}
+
+	isPositiveInteger = function (str) {
+    	return /^\+?(0|[1-9]\d*)$/.test(str);
+	}
+
+	getDataPreview = function () {
+      $.getJSON(SERVER_URL+"getDataPreview", { }, function(data) {
+          try {          
+          	$("#preloader").hide();
+          	$('#data_preview tbody > tr').remove();
+          	var triple = "";
+          	for (var i = 0; i < data.length; i++) {
+          		triple ='<tr><td style="word-break: break-all;">'+encodeTriple(data[i].subject)+'</td><td style="word-break: break-all">'+encodeTriple(data[i].predicate)+'</td><td style="word-break: break-all">'+encodeTriple(data[i].object)+'</td></tr>';
+          		$("#data_preview > tbody:last").append(triple);
+          	}
+          } catch (err) {
+          	alert(err);
+          }
+      });  
+    }
+
+    encodeTriple = function (str) {
+    	if (str == undefined || str == null)
+    		return str;
+    	str = str.replace("<","&lt;");
+    	str = str.replace(">","&gt;");
+    	return str;
+    }
+
+  </script>
+
+</body>
+</html>

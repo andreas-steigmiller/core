@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--[if IE 8]> 				 <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>SemFacet</title>
+  <link rel="shortcut icon" href="Client/img/favicon.ico" type="image/x-icon" />
+  
+  <link rel="stylesheet" href="Client/css/foundation.css" />
+  <link rel="stylesheet" href="Client/css/semfacet.css" />
+  
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+  <script src="Client/js/vendor/custom.modernizr.js"></script>
+
+</head>
+<body>
+	<!-- Header and Nav -->
+<div id="preloader"><img src="Client/img/ajax-loader.gif" class="center_loader"/></div>
+  <div class="row" style="margin-top:40px;">
+	     <img src="Client/img/SemFacet.png" style="display: block; margin-bottom:10px; margin-left: auto; margin-right: auto; height:40px" />
+       <div style="text-align:center;font-size:12px"> Licensed under <a target="_blank" href="Client/SemFacet_Academic_Licence.txt">academic licence</a></div>
+  </div>
+  <div class="row" style="margin-top:20px;">
+  	<div class="row collapse">
+    	<div class="large-10 columns">
+    		<input type="text" placeholder="Enter keywords..." id="searchText" onkeypress="runSearch(event)"/>
+  		</div>
+  		<div class="large-2 columns" onclick="getMainCategories()">
+    		<a class="button expand postfix" style="background-color:#1B7488;float:left; width:60%">Search</a><a href="manager.html"><img src="Client/img/icon-settings.png" style="height:40px" /></a>
+  		</div>
+	</div>
+  </div>
+  
+  <!-- End Header and Nav -->
+  
+  <div class="row">    
+    
+    <!-- Main Content Section -->
+    <!-- This has been source ordered to come first in the markup (and on small devices) but to be to the right of the nav on larger screens -->
+    <div class="large-8 push-4 columns">
+      <div class="row" >
+      	<div id="map-canvas" style="width:90%; height:400px; display: none"> </div>
+      </div>
+      <div class="row" id="results" style="margin-top:20px">
+      </div>
+    </div>
+    
+    <!-- Nav Sidebar -->
+    <!-- This is source ordered to be pulled to the left on larger screens -->
+    <div class="large-4 pull-8 columns" style="text-align:left;">
+    	<div id="navigation_map" style="padding-bottom: 10px;"></div>
+    	<div id = "main-categories" ></div>
+    	<div id ="facets" style="max-height: 1000px; overflow-y: scroll;"></div>
+  	</div>
+  </div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'Client/js/vendor/zepto' : 'Client/js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  
+  <script src="Client/js/foundation.min.js"></script>
+  <script type="text/javascript" src="Client/js/semfacet.js"></script>
+</body>
+</html>

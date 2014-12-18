@@ -1,0 +1,4 @@
+mvn install:install-file -Dfile=jrdfox.jar -DgroupId=cs.ox.uk \
+    -DartifactId=jrdfox -Dversion=1.0.0 -Dpackaging=jar
+mvn install:install-file -Dfile=pagoda.jar -DgroupId=cs.ox.uk \
+    -DartifactId=pagoda -Dversion=1.0.0 -Dpackaging=jar
