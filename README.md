@@ -4,7 +4,7 @@ SemFacet
 SemFacet is a semantic facet based search system.
 
 
-Project requirements
+Project dependencies/requirements
 =====
 
 - JavaSE 8
