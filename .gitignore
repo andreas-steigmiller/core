@@ -1,30 +1,26 @@
+/bin/
+/target/
 
 .classpath
 
+.DS_Store
+
+.DS_Store
+
 .project
 
-*.prefs
-
-.settings/org.eclipse.wst.common.project.facet.core.prefs.xml
-
-.settings/org.eclipse.wst.jsdt.ui.superType.container
-
-bin/log4j.properties
-
 .settings/.jsdtscope
+
+*.prefs
 
 .settings/org.eclipse.wst.common.component
 
 .settings/org.eclipse.wst.common.project.facet.core.xml
 
+.settings/org.eclipse.wst.common.project.facet.core.prefs.xml
+
+.settings/org.eclipse.wst.common.project.facet.core.prefs.xml
+
+.settings/org.eclipse.wst.jsdt.ui.superType.container
+
 .settings/org.eclipse.wst.jsdt.ui.superType.name
-
-*.class
-
-target/classes/log4j.properties
-
-target/m2e-wtp/web-resources/META-INF/MANIFEST.MF
-
-target/m2e-wtp/web-resources/META-INF/maven/cs.ox.ac.uk.semFacet/semFacet/pom.properties
-
-target/m2e-wtp/web-resources/META-INF/maven/cs.ox.ac.uk.semFacet/semFacet/pom.xml
