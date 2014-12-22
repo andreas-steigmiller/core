@@ -1,7 +1,7 @@
 SemFacet
 =====
 
-SemFacet is a semantic facet based search system.
+SemFacet is a semantic facet based search system. The instruction how to use it can be found on the following website: http://www.cs.ox.ac.uk/isg/tools/SemFacet/ 
 
 
 Project dependencies/requirements
