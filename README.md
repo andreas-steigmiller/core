@@ -16,7 +16,7 @@ How to compile the project?
 
 - In order to compile the project make sure that you have JavaSE 8 and the latest Maven installed on your computer.
 - If you use Eclipse IDE, then you will need to convert the project into Maven project.
-- The project depends on 2 libraries that are not in central maven repository: JRDFox and Pagoda. These libraries can be found in WebContent/WEB-INF/lib directory. You need to install those libraries in the local maven repository. This can be done by executing the script which is provided in WebContent/WEB-INF/lib/install_3dparty_libs_to_maven .
+- The project depends on 2 libraries that are not in central maven repository: JRDFox and Pagoda. These libraries can be found in WebContent/WEB-INF/lib directory. You need to install those libraries in the local maven repository. This can be done by executing the script which is provided in WebContent/WEB-INF/lib/install_3dparty_libs_to_maven . Note: the libraries provided in this project are compiled for the MAC OS. You can download libraries for different distributions using the following link: www.cs.ox.ac.uk/isg/tools/ 
 
 
 How to package the project?
