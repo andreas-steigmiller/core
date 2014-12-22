@@ -266,7 +266,7 @@ generateFirstFacet = function(data) {
 
 updateSliderSpan = function(el) {
 	element = $(el);
-	element.next().html(element.val());
+	element.siblings("div").first().html(element.val());
 	executeUnselectedFacetValueQuery();
 }
 
@@ -274,8 +274,8 @@ generateSliderDiv = function(min, max, facet_name, facet_id) {
 	var step = (max - min) / 100;
 	var mid = min + (max - min) / 2;
 	return '<div class="slider_div">' +
-  				'<input type="range" min="' + min + '" max="' + max + '" step="' + step +'" onchange="updateSliderSpan(this);" facet_name="' + facet_name + '" facet_id="' + facet_id + '">' +
-    			'<span>' + mid + '</span>' +
+  				'<input type="range" min="' + min + '" max="' + max + '" step="' + step +'" onchange="updateSliderSpan(this);" facet_name="' + facet_name + '" facet_id="' + facet_id + '" style="width:100%">' +
+    			'<div style="text-align:center;">' + mid + '</div>' +
 			'</div>'
 }
 
