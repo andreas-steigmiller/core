@@ -2,6 +2,11 @@
  * 
  * Semfacet(c) Copyright University of Oxford, 2014. All Rights Reserved.
  *
+ *
+ * This class is the starting point of the SemFacet web service. It can be accessed using the following url "http://localhost:8080/semFacet/rest/WebService/".
+ * The web service url can be changed by modifying pom.xml and this class. To check if the service is running correctly one could test it in a web browser,
+ * by providing sub urls and parameters of interest. For example, "http://localhost:8080/semFacet/rest/WebService/getInitialFacet?search_keywords=test".
+ *
  */
 
 package semfacet.webService;
