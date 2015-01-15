@@ -1,3 +1,7 @@
+/**
+ * This class was added to create search index. At the moment it is very basic. In general, it should be extended with more advanced functionality. 
+ */
+
 package semfacet.search;
 
 import java.util.Collection;
