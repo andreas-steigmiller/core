@@ -1,3 +1,6 @@
+/**
+ * This class is used to load various data before the system starts. Here all "OFFLINE" computations are done.
+ */
 package semfacet.data.init;
 
 import java.io.File;
@@ -88,11 +91,11 @@ public class DataContextListener implements ServletContextListener {
         config.setIdLabelMap(QueryExecutor.mapLabelsToIds(config));
         LOG.info("Number of ids that have labels : " + config.getIdLabelMap().size());
         LOG.info("Labels were mapped.");
-        
+
         LOG.info("Create hierarchy map.");
         config.setHierarchyMap(QueryExecutor.getHierarchyMap(config));
         LOG.info("Hierarchy map was created.");
-        
+
         LOG.info("Analyze and set predicate types.");
         Set<String> predicates = QueryExecutor.getAllPredicates(config);
         Map<String, FacetName> facetTypeMap = new HashMap<String, FacetName>();
@@ -177,7 +180,7 @@ public class DataContextListener implements ServletContextListener {
             predicateSet.add(predicate);
         return predicateSet;
     }
-    
+
     public static void setDefaultExcludedPredicates(Set<String> excludedPredicates, Configurations config) {
         excludedPredicates.add(config.getSnippetImagePredicate());
         excludedPredicates.add(config.getSnippetURLPredicate());
