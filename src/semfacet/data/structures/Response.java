@@ -1,3 +1,6 @@
+/**
+ * This class represents a typical response, when client sends request to the SemFacet web service.
+ */
 package semfacet.data.structures;
 
 import java.util.List;
@@ -11,60 +14,60 @@ public class Response {
     private int activePage;
 
     public Response() {
-	this.activePage = 0;
+        this.activePage = 0;
     }
 
     public Response(List<FacetName> facetNames, List<FacetValue> facetValues) {
-	this.facetNames = facetNames;
-	this.facetValues = facetValues;
+        this.facetNames = facetNames;
+        this.facetValues = facetValues;
     }
 
     public int getActivePage() {
-	return activePage;
+        return activePage;
     }
 
     public void setActivePage(int activePage) {
-	this.activePage = activePage;
+        this.activePage = activePage;
     }
 
     public List<Snippet> getSnippets() {
-	return snippets;
+        return snippets;
     }
 
     public void setSnippets(List<Snippet> snippets) {
-	this.snippets = snippets;
+        this.snippets = snippets;
     }
 
     public int getSize() {
-	return size;
+        return size;
     }
 
     public void setSize(int size) {
-	this.size = size;
+        this.size = size;
     }
 
     public List<FacetName> getFacetNames() {
-	return facetNames;
+        return facetNames;
     }
 
     public void setFacetNames(List<FacetName> facetNames) {
-	this.facetNames = facetNames;
+        this.facetNames = facetNames;
     }
 
     public List<FacetValue> getFacetValues() {
-	return facetValues;
+        return facetValues;
     }
 
     public void setFacetValues(List<FacetValue> facetValues) {
-	this.facetValues = facetValues;
+        this.facetValues = facetValues;
     }
 
     public FacetName getFirstFacetName() {
-	return firstFacetName;
+        return firstFacetName;
     }
 
     public void setFirstFacetName(FacetName firstFacetName) {
-	this.firstFacetName = firstFacetName;
+        this.firstFacetName = firstFacetName;
     }
 
 }

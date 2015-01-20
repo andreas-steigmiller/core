@@ -1,3 +1,6 @@
+/**
+ * This class represents SemFacet snippet. Usually, it evolves over time.
+ */
 package semfacet.data.structures;
 
 public class Snippet {

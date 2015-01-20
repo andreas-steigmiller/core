@@ -1,3 +1,7 @@
+/**
+ * This class represents SemFacet facet name. It changes quite frequently over time.
+ */
+
 package semfacet.data.structures;
 
 public class FacetName {

@@ -1,3 +1,8 @@
+/**
+ * This class is used to store user activity information while using SemFacet (i.e. what facet name was clicked, what search keyword was entered). One could extend it with extra information if needed.
+ * Later, this information can be used for ranking.
+ */
+
 package semfacet.data.structures;
 
 import java.sql.Timestamp;

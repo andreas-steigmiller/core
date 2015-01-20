@@ -1,3 +1,7 @@
+/**
+ * This class represents SemFacet facet value. It changes quite frequently over time.
+ */
+
 package semfacet.data.structures;
 
 // TODO: pick better names for facet value properties

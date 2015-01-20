@@ -1,3 +1,7 @@
+/**
+ *  This class represents various information that is passed among different methods. In general, it captures most common parameters of different methods. In order, to keep the parameter count low, I added all of them in this class. 
+ *  Maybe it is not the best way to deal with the situation, but I could not figure out anything better.
+ */
 package semfacet.data.structures;
 
 import java.util.Map;
