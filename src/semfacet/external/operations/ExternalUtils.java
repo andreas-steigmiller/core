@@ -1,3 +1,9 @@
+/**
+ * This class uses external library to convert query into DNF. The query passed from the client side might have various reserved symbols by the external library.
+ * Therefore, here we also have methods to encode and decode those symbols. The work flow is as follows: encode string; create DNF; decode string.
+ *  
+ */
+
 package semfacet.external.operations;
 
 import java.util.ArrayList;
