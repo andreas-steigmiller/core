@@ -1,3 +1,9 @@
+/**
+ * 
+ * This class is the main class, which contains various methods deal with logic part for client requests. In MVC this would be call a Controller class. Maybe this class already grew too much and maybe it makes sense to separate it into smaller classes.
+ *
+ **/
+
 package semfacet.controler;
 
 import java.util.ArrayList;

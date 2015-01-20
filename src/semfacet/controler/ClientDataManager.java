@@ -1,3 +1,6 @@
+/*
+ * This class mainly deals with json objects sent from a client and converts them to a java objects.
+ */
 package semfacet.controler;
 
 import java.util.ArrayList;

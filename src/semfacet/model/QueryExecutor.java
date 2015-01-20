@@ -1,5 +1,5 @@
 /**
- * This class is the main class, which contains various methods to execute queries on a triple store. In MVC this would be call a Controller class. Maybe this class already grew too much and maybe it makes sense to separate it into smaller classes.
+ * This class is the main class, which contains various methods to execute queries on a triple store. In MVC this would be call a Model class. Maybe this class already grew too much and maybe it makes sense to separate it into smaller classes.
  */
 
 package semfacet.model;

@@ -1,3 +1,6 @@
+/**
+ * This class contains "quickly" added methods. One should think where to put them better.
+ */
 package semfacet.controler;
 
 import java.io.File;

@@ -1,3 +1,7 @@
+/**
+ * This class converts data sent from a client to a 3shaped query.
+ */
+
 package semfacet.controler;
 
 import java.util.ArrayList;
@@ -254,7 +258,7 @@ public class FacetQueryConstructionManager {
     public static void appendSliderQueries(List<String> queryList, List<FacetName> sliders) {
         for (FacetName fName : sliders) {
             String facetParent = getFacetParentId(fName.getId());
-            for (int i = 0; i<queryList.size(); i++) {
+            for (int i = 0; i < queryList.size(); i++) {
                 String query = queryList.get(i);
                 if (query.contains(facetParent)) {
                     query += " . " + facetParent + " <" + fName.getName() + "> ?" + fName.getId() + " . FILTER (?" + fName.getId() + " >= \""
