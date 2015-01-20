@@ -1,3 +1,6 @@
+/**
+ * This enum is used for different predicate types, so it is easier later on to add new ones and handle them. 
+ */
 package semfacet.data.enums;
 
 //TODO: Add all owl types
