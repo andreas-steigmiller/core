@@ -529,7 +529,7 @@ public class QueryExecutor {
             }
             tupleIterator.dispose();
         }
-        if (!type.equals(PredicateTypeEnum.UNKNOWN)) {
+        if (!type.equals(PredicateTypeEnum.UNKNOWN) && !min.equals(Float.POSITIVE_INFINITY) && !max.equals(Float.NEGATIVE_INFINITY)) {
             facetName.setMax(max);
             facetName.setMin(min);
         }
