@@ -43,6 +43,9 @@ public class PagodaAdapter implements Store {
 
     @Override
     public ResultSet executeQuery(String query, boolean computeUpperBound) {
+    	if (!computeUpperBound) {
+    		query = query.replace("?checkbox", "_:checkbox").replace("?any", "_:any");
+    	}
         ResultSet result = new PagodaTupleIteratorAdapter(store.evaluate(query, computeUpperBound));
         return result;
     }
