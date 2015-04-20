@@ -32,7 +32,7 @@ public class PagodaTupleIteratorAdapter implements ResultSet {
     @Override
     public String getItem(int index) {
         AnswerTuple answer = iterator.getTuple();
-        String result = answer.getRawTerm(index);
+        String result = answer.getGroundTerm(index).toString();
         if (result != null)
             result = result.trim();
         if (result.startsWith("<") && result.endsWith(">"))

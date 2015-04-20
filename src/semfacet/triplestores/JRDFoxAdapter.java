@@ -73,7 +73,7 @@ public class JRDFoxAdapter implements Store {
             try {
                 OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
                 OWLOntology ontology = manager.loadOntologyFromOntologyDocument(file);
-                store.addOntology(ontology);
+                store.importOntology(ontology);
             } catch (JRDFStoreException | OWLOntologyCreationException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

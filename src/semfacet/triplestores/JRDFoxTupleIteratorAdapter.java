@@ -51,7 +51,7 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 	@Override
 	public String getItem(int index) {
 		try {
-			String result = iterator.getRawGroundTerm(index);
+			String result = iterator.getGroundTerm(index).toString();
 			if (result.startsWith("<") && result.endsWith(">"))
 				return result.replace("<", "").replace(">", "");
 			int first = result.indexOf('"');
