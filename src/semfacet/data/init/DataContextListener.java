@@ -132,7 +132,7 @@ public class DataContextListener implements ServletContextListener {
         Configurations config = new Configurations();
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(path + "/CONFIG/fly-sys.conf");
+            inputStream = new FileInputStream(path + "/CONFIG/sys.conf");
             properties.load(inputStream);
             config.setDataPath(path + properties.getProperty("DATA"));
             config.setOntologyPath(path + properties.getProperty("ONTOLOGY"));
