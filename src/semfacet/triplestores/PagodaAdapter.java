@@ -13,10 +13,12 @@ public class PagodaAdapter implements Store {
 
     private QueryReasoner store;
 
-    public PagodaAdapter(String ontologyPath) {
+    public PagodaAdapter(String ontologyPath, boolean toClassify, boolean toCallHermiT) {
         try {
             OWLOntology ontology = OWLHelper.loadOntology(ontologyPath);
-            this.store = QueryReasoner.getInstanceForSemFacet(ontology);
+            store = QueryReasoner.getInstance(ontology);
+            store.setToClassify(toClassify);
+            store.setToCallHermiT(toCallHermiT);
         } catch (Exception e) {
             LOG.error("Ontology was not found.");
         }

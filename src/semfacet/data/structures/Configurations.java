@@ -299,4 +299,22 @@ public class Configurations {
         this.facetTypeMap = facetTypeMap;
     }
 
+    boolean pagodaToClassify = false, pagodaToCallHermiT = true; 
+    
+	public boolean getPAGOdAToClassify() {
+		return pagodaToClassify;
+	}
+
+	public void setPAGOdAToClassify(boolean flag) {
+		pagodaToClassify = flag;
+	}
+
+	public boolean getPAGOdAToCallHermiT() {
+		return pagodaToCallHermiT;
+	}
+
+	public void setPAGOdAToCallHermiT(boolean flag) {
+		pagodaToCallHermiT = flag;
+	}
+
 }

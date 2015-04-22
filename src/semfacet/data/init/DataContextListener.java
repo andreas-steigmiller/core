@@ -112,7 +112,7 @@ public class DataContextListener implements ServletContextListener {
             store = new JRDFoxAdapter();
             break;
         case PAGODA:
-            store = new PagodaAdapter(config.getOntologyPath());
+            store = new PagodaAdapter(config.getOntologyPath(), config.getPAGOdAToClassify(), config.getPAGOdAToCallHermiT());
             break;
         case SESAME:
             store = new SesameAdapter();
@@ -150,6 +150,10 @@ public class DataContextListener implements ServletContextListener {
             config.setLongitudePredicate(properties.getProperty("LONGITUDE_PREDICATE"));
             config.setLatitudePredicate(properties.getProperty("LATITUDE_PREDICATE"));
             config.setStoreType(properties.getProperty("STORE_TYPE"));
+            if (StoresEnum.valueOf(config.getStoreType()) == StoresEnum.PAGODA) {
+            	config.setPAGOdAToClassify(Boolean.parseBoolean(properties.getProperty("PAGODA_TO_CLASSIFY")));
+            	config.setPAGOdAToCallHermiT(Boolean.parseBoolean(properties.getProperty("PAGODA_CALL_HERMIT")));
+            }
             String nesting = properties.getProperty("NESTING");
             if ("disabled".equals(nesting))
                 config.setNesting(false);
