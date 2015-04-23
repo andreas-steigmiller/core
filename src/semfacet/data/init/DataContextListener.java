@@ -136,7 +136,8 @@ public class DataContextListener implements ServletContextListener {
             properties.load(inputStream);
             config.setDataPath(path + properties.getProperty("DATA"));
             config.setOntologyPath(path + properties.getProperty("ONTOLOGY"));
-            config.setMaxSearchResuls(Integer.parseInt(properties.getProperty("MAX_RESULTS_FROM_KEYWORDS")));
+            String value = properties.getProperty("MAX_RESULTS_FROM_KEYWORDS"); 
+            if (value != null) config.setMaxSearchResuls(Integer.parseInt(value));
             config.setSnippetImagePredicate(properties.getProperty("SNIPPET_IMAGE_PEDICATE"));
             config.setSnippetURLPredicate(properties.getProperty("SNIPPET_URL_PREDICATE"));
             config.setSnippetDescriptionPredicate(properties.getProperty("SNIPPET_DESCRIPTION_PREDICATE"));
@@ -151,8 +152,10 @@ public class DataContextListener implements ServletContextListener {
             config.setLatitudePredicate(properties.getProperty("LATITUDE_PREDICATE"));
             config.setStoreType(properties.getProperty("STORE_TYPE"));
             if (StoresEnum.valueOf(config.getStoreType()) == StoresEnum.PAGODA) {
-            	config.setPAGOdAToClassify(Boolean.parseBoolean(properties.getProperty("PAGODA_TO_CLASSIFY")));
-            	config.setPAGOdAToCallHermiT(Boolean.parseBoolean(properties.getProperty("PAGODA_CALL_HERMIT")));
+            	if ((value = properties.getProperty("PAGODA_TO_CLASSIFY")) != null)
+            		config.setPAGOdAToClassify(Boolean.parseBoolean(value));
+            	if ((value = properties.getProperty("PAGODA_CALL_HERMIT")) != null)
+            		config.setPAGOdAToCallHermiT(Boolean.parseBoolean(value));
             }
             String nesting = properties.getProperty("NESTING");
             if ("disabled".equals(nesting))

@@ -43,7 +43,7 @@ public class Configurations {
     @Expose
     private String storeType;
     @Expose
-    private int maxSearchResuls;
+    private int maxSearchResuls = Integer.MAX_VALUE;
     @Expose
     private boolean nesting;
     @Expose
