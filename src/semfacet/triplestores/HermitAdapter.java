@@ -37,6 +37,7 @@ public class HermitAdapter implements Store {
 
     @Override
     public ResultSet executeQuery(String query, boolean computeUpperBound) {
+    	if (!computeUpperBound) queryLog.add(query);
         ResultSet result = new HermitTupleIteratorAdapter(store.evaluate(query, computeUpperBound));
         return result;
     }
@@ -49,7 +50,15 @@ public class HermitAdapter implements Store {
 
     @Override
     public void dispose() {
+    	queryLog.dispose();
         store.dispose();
     }
+
+    QueryLog queryLog; 
+    
+	@Override
+	public void setQueryLog(QueryLog queryLog) {
+		this.queryLog = queryLog; 
+	}
 
 }

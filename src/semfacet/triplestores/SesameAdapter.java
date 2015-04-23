@@ -59,6 +59,7 @@ public class SesameAdapter implements Store {
 
     @Override
     public ResultSet executeQuery(String query, boolean computeUpperBound) {
+    	if (!computeUpperBound) queryLog.add(query);    	
         ResultSet result = null;
         try {
             TupleQuery tupleQuery = store.prepareTupleQuery(QueryLanguage.SPARQL, query, null);
@@ -81,6 +82,7 @@ public class SesameAdapter implements Store {
 
     @Override
     public void dispose() {
+    	queryLog.dispose();
         try {
             repository.shutDown();
         } catch (RepositoryException e) {
@@ -88,5 +90,12 @@ public class SesameAdapter implements Store {
         }
 
     }
+    
+    QueryLog queryLog; 
+
+	@Override
+	public void setQueryLog(QueryLog queryLog) {
+		this.queryLog = queryLog;		
+	}
 
 }

@@ -124,6 +124,7 @@ public class DataContextListener implements ServletContextListener {
             store = new JRDFoxAdapter();
             break;
         }
+        store.setQueryLog(new QueryLog(config.getQueryLogPath())); 
         return store;
     }
 
@@ -132,7 +133,7 @@ public class DataContextListener implements ServletContextListener {
         Configurations config = new Configurations();
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(path + "/CONFIG/fly-sys.conf");
+            inputStream = new FileInputStream(path + "/CONFIG/sys.conf");
             properties.load(inputStream);
             config.setDataPath(path + properties.getProperty("DATA"));
             config.setOntologyPath(path + properties.getProperty("ONTOLOGY"));
@@ -157,6 +158,8 @@ public class DataContextListener implements ServletContextListener {
             	if ((value = properties.getProperty("PAGODA_CALL_HERMIT")) != null)
             		config.setPAGOdAToCallHermiT(Boolean.parseBoolean(value));
             }
+            if ((value = properties.getProperty("QUERY_LOG")) != null)  
+            	config.setQueryLogPath(value);
             String nesting = properties.getProperty("NESTING");
             if ("disabled".equals(nesting))
                 config.setNesting(false);

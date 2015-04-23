@@ -30,6 +30,7 @@ public class JRDFoxAdapter implements Store {
 
     @Override
     public ResultSet executeQuery(String query, boolean computeUpperBound) {
+    	if (!computeUpperBound)	queryLog.add(query);
         ResultSet result = null;
         try {
             result = new JRDFoxTupleIteratorAdapter(store.compileQuery(query, prefixes, parameters));
@@ -63,6 +64,7 @@ public class JRDFoxAdapter implements Store {
 
     @Override
     public void dispose() {
+    	queryLog.dispose();
         store.dispose();
     }
 
@@ -81,4 +83,11 @@ public class JRDFoxAdapter implements Store {
         }
 
     }
+
+    QueryLog queryLog; 
+    
+	@Override
+	public void setQueryLog(QueryLog queryLog) {
+		this.queryLog = queryLog; 		
+	}
 }

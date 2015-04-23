@@ -316,5 +316,15 @@ public class Configurations {
 	public void setPAGOdAToCallHermiT(boolean flag) {
 		pagodaToCallHermiT = flag;
 	}
+	
+	String queryLogPath = "querylog"; 
+	
+	public String getQueryLogPath() {
+		return queryLogPath;
+	}
+
+	public void setQueryLogPath(String path) {
+		queryLogPath = path; 
+	}
 
 }

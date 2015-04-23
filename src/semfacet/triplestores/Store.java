@@ -21,4 +21,7 @@ public interface Store {
     long getItemsCount();
 
     void dispose();
+
+	void setQueryLog(QueryLog queryLog);
+	
 }

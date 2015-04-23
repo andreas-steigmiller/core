@@ -506,6 +506,16 @@ public class FeedService {
         try {
             config.getTripleStore().dispose();
             config.setStoreType(storeType);
+            String queryLogPath = config.getQueryLogPath();
+            if (queryLogPath != null)
+            	if (queryLogPath.endsWith(")")) {
+            		String prefix = queryLogPath.substring(0, queryLogPath.lastIndexOf("("));
+            		int index = Integer.parseInt(queryLogPath.substring(queryLogPath.lastIndexOf("("), queryLogPath.length() - 1));
+            		config.setQueryLogPath(prefix + "(" + (index + 1) + ")");
+            	}
+            	else {
+            		config.setQueryLogPath(queryLogPath + "(1)");
+            	}
             File ontologyFile = Utils.streamTofile(ontologyInputStream, oFileDetail);
             File dataFile = Utils.streamTofile(dataInputStream, dFileDetail);
 
