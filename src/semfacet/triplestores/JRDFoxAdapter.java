@@ -22,7 +22,7 @@ public class JRDFoxAdapter implements Store {
 
     public JRDFoxAdapter() throws StoreException {
         try {
-            this.store = new DataStore(DataStore.StoreType.NarrowParallelHead, false);
+            this.store = new DataStore(DataStore.StoreType.ParallelSimpleNN);
         } catch (JRDFStoreException e) {
             throw new StoreException(e.getMessage());
         }
@@ -43,8 +43,11 @@ public class JRDFoxAdapter implements Store {
     @Override
     public void loadData(File file) throws StoreException {
         try {
-            if (file != null && file.exists())
-                store.importTurtleFile(file, prefixes);
+            if (file != null && file.exists()) {
+            	File[] files = new File[1];
+            	files[0] = file;
+                store.importFiles(files, prefixes);
+            }
             store.applyReasoning();
         } catch (JRDFStoreException e) {
             throw new StoreException(e.getMessage());

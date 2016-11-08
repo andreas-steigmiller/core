@@ -100,7 +100,8 @@ public class DataContextListener implements ServletContextListener {
         Set<String> predicates = QueryExecutor.getAllPredicates(config);
         Map<String, FacetName> facetTypeMap = new HashMap<String, FacetName>();
         for (String predicate : predicates)
-            facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataType(predicate, config));
+            //facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataType(predicate, config));
+        	facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataTypeA(predicate, config));
         config.setFacetTypeMap(facetTypeMap);
         LOG.info("Predicate types were set.");
     }

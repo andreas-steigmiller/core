@@ -66,6 +66,11 @@ public class SesameTupleIteratorAdapter implements ResultSet {
 	String name = bindingNames.get(index);
 	return bindingSet.getValue(name).stringValue();
     }
+    
+    @Override
+    public String getNativeItem(int index) {
+    	return getItem(index);
+    }
 
     @Override
     public boolean isIndividual(int index) {

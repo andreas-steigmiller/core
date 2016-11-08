@@ -15,6 +15,8 @@ public interface ResultSet {
     void open();
 
     String getItem(int index);
+    
+    String getNativeItem (int index);
 
     // most of the triple stores do not have this method. So it either should be
     // removed or its usage should be limited, or implemented from scratch using

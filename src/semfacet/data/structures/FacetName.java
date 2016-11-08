@@ -4,6 +4,8 @@
 
 package semfacet.data.structures;
 
+import java.time.*;
+
 public class FacetName {
     private String id; // id is retrieved from the client side, currently it is
                        // not used in the server side
@@ -14,6 +16,14 @@ public class FacetName {
     private Float max;
     private String sliderValue;
     private boolean hidden;
+    private LocalDateTime minDateTime;
+    private LocalDateTime maxDateTime;
+    private String DateTimeMinValue;
+    private String DateTimeMaxValue;
+    private Integer numberOfDateTime;
+    private Integer numberOfNumerics;
+    private String IntgerMinValue;
+    private String IntgerMaxValue;
 
     public FacetName() {
 
@@ -95,6 +105,14 @@ public class FacetName {
     public void setMax(Float max) {
         this.max = max;
     }
+    
+    public Integer getNumberOfNumerics(){
+    	return numberOfNumerics;
+    }
+    
+    public void setNumberOfNumerics(Integer numberOfNumerics){
+    	this.numberOfNumerics = numberOfNumerics;
+    }
 
     public String getSliderValue() {
         return sliderValue;
@@ -103,5 +121,63 @@ public class FacetName {
     public void setSliderValue(String sliderValue) {
         this.sliderValue = sliderValue;
     }
-
+     
+    
+    public String getSliderIntegerMinValue() {
+    	return IntgerMinValue;
+    }
+    
+    public void setSliderIntegerMinValue(String IntegerMinValue) {
+    	this.IntgerMinValue = IntegerMinValue;
+    }
+    
+    public String getSliderIntegerMaxValue() {
+    	return IntgerMaxValue;
+    }
+    
+    public void setSliderIntegerMaxValue(String IntegerMaxValue) {
+    	this.IntgerMaxValue = IntegerMaxValue;
+    }
+    
+    
+    public LocalDateTime getMinDateTime(){
+    	return minDateTime;
+    }
+    
+    public void setMinDateTime(LocalDateTime minDateTime){
+    	this.minDateTime = minDateTime;
+    }
+        
+    public LocalDateTime getMaxDateTime(){
+    	return maxDateTime;
+    }
+    
+    public void setMaxDateTime(LocalDateTime maxDateTime){
+    	this.maxDateTime = maxDateTime;
+    }
+    
+    public String getSliderDateTimeMaxValue(){
+    	return DateTimeMaxValue;
+    }
+    
+    public void setSliderDateTimeMaxValue(String DateTimeMaxValue){
+    	this.DateTimeMaxValue = DateTimeMaxValue;
+    }
+    
+    public String getSliderDateTimeMinValue(){
+    	return DateTimeMinValue;
+    }
+    
+    public void setSliderDateTimeMinValue(String DateTimeMinValue){
+    	this.DateTimeMinValue = DateTimeMinValue;
+    }
+    
+    public Integer getNumberOfDateTime(){
+    	return numberOfDateTime;
+    }
+    
+    public void setNumberOfDateTime(Integer numberOfDateTime){
+    	this.numberOfDateTime = numberOfDateTime;
+    }
+    
 }

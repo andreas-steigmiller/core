@@ -23,7 +23,7 @@ public class SearchIndex {
     }
 
     protected static String cleanText(String text) {
-        return text.toLowerCase().trim();
+        return text.replaceAll("[^a-zA-Z0-9 ]", " ").toLowerCase().trim();
     }
 
     public Collection<String> getIdsForSearchKeyword(String keyword) {

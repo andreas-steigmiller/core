@@ -261,13 +261,50 @@ public class FacetQueryConstructionManager {
             for (int i = 0; i < queryList.size(); i++) {
                 String query = queryList.get(i);
                 if (query.contains(facetParent)) {
-                    query += " . " + facetParent + " <" + fName.getName() + "> ?" + fName.getId() + " . FILTER (?" + fName.getId() + " >= \""
-                            + fName.getSliderValue() + "\") ";
+                   // query += " . " + facetParent + " <" + fName.getName() + "> ?" + fName.getId() + " . FILTER (?" + fName.getId() + " >= \""
+                   //         + fName.getSliderValue() + "\") ";
+                    query += " . " + facetParent + " <" + fName.getName() + "> ?" + fName.getId() + " . FILTER (?" + fName.getId() + " >= "
+                            + fName.getMin().toString() + " && ?" + fName.getId() + " <= " + fName.getMax().toString() + ") ";
                     queryList.set(i, query);
                 }
             }
         }
 
+    }
+    
+    //query for integers
+    
+    public static void appendIntegerQueries(List<String> queryList, List<FacetName> sliders) {
+        for (FacetName fName : sliders) {
+            String facetParent = getFacetParentId(fName.getId());
+            for (int i = 0; i < queryList.size(); i++) {
+                String query = queryList.get(i);
+                if (query.contains(facetParent)) {
+    				query += " . " + facetParent + " <" + fName.getName() + "> ?" + fName.getId() + " . FILTER (?" + fName.getId() + " >= \""
+    						+ fName.getSliderIntegerMinValue() + "\"^^<http://www.w3.org/2001/XMLSchema#integer> && ?" + fName.getId() + "<= \"" + fName.getSliderIntegerMaxValue() 
+    						+ "\"^^<http://www.w3.org/2001/XMLSchema#integer> ) ";
+                    queryList.set(i, query);
+                }
+            }
+        }
+
+    }
+    
+    
+    //query for dateTime
+    public static void appendDateTimeQueries(List<String> queryList, List<FacetName> datetimesliders){
+    	for (FacetName fName: datetimesliders) {
+    		String facetParent = getFacetParentId(fName.getId());
+    		for (int i = 0; i < queryList.size(); i++) {
+    			String query = queryList.get(i);
+    			if (query.contains(facetParent)) {
+    				query += " . " + facetParent + " <" + fName.getName() + "> ?" + fName.getId() + " . FILTER (?" + fName.getId() + " >= \""
+    						+ fName.getSliderDateTimeMinValue() + "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> && ?" + fName.getId() + "<= \"" + fName.getSliderDateTimeMaxValue() 
+    						+ "\"^^<http://www.w3.org/2001/XMLSchema#dateTime> ) ";
+    				queryList.set(i, query);
+    			}
+    		}
+    	}
     }
 
     private static String getFacetParentId(String id) {

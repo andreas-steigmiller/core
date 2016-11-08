@@ -54,13 +54,66 @@ public class ClientDataManager {
                 FacetName fName = new FacetName();
                 fName.setId(ob.get("facet_id").toString());
                 fName.setName(ob.get("facet_name").toString());
-                fName.setSliderValue(ob.get("value").toString());
+                //fName.setSliderValue(ob.get("value").toString());
+                fName.setMin(Float.parseFloat(ob.get("min").toString()));
+                fName.setMax(Float.parseFloat(ob.get("max").toString()));
+                //fName.setNumberOfNumerics(Integer.parseInt(ob.get("numberOfNumerics").toString()));
                 sliders.add(fName);
             }
         } catch (JSONException e) {
             LOG.error(e.getMessage());
         }
         return sliders;
+    }
+    
+    //to get slider values for integers
+    
+    public static List<FacetName> getSliderIntegerValues(String rangeIntegerSliders) {
+        List<FacetName> sliders = new ArrayList<FacetName>();
+        if (rangeIntegerSliders == null)
+            return sliders;
+        JSONArray array;
+        try {
+            array = new JSONArray(rangeIntegerSliders);
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject ob = array.getJSONObject(i);
+                FacetName fName = new FacetName();
+                fName.setId(ob.get("facet_id").toString());
+                fName.setName(ob.get("facet_name").toString());
+                fName.setSliderIntegerMinValue(ob.get("min_int").toString());
+                fName.setSliderIntegerMaxValue(ob.get("max_int").toString());
+                sliders.add(fName);
+            }
+        } catch (JSONException e) {
+            LOG.error(e.getMessage());
+        }
+        return sliders;
+    }
+    
+    
+    
+    //to get slider values from front end
+    
+    public static List<FacetName> getSliderDateTimeValues(String rangeDateTimeSliders){
+    	List<FacetName> datetimeSliders = new ArrayList<FacetName>();
+    	if (rangeDateTimeSliders == null)
+    		return datetimeSliders;
+    	JSONArray array;
+    	try {
+    		array  = new JSONArray(rangeDateTimeSliders);
+    		for (int i = 0; i < array.length(); i++) {
+    			JSONObject ob = array.getJSONObject(i);
+    			FacetName fName = new FacetName();
+    			fName.setId(ob.get("facet_id").toString());
+    			fName.setName(ob.get("facet_name").toString());
+    			fName.setSliderDateTimeMinValue(ob.get("min_value").toString());
+    			fName.setSliderDateTimeMaxValue(ob.get("max_value").toString());
+    			datetimeSliders.add(fName);
+    		}
+    	} catch (JSONException e) {
+    		LOG.error(e.getMessage());
+    	}
+    	return datetimeSliders;
     }
 
     private static String encodeFacetValues(String value) {

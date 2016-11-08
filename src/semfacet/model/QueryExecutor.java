@@ -14,6 +14,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 
 import org.apache.log4j.Logger;
 
@@ -311,12 +315,14 @@ public class QueryExecutor {
         ResultSet tupleIterator = null;
         String objectQuery;
         for (String q : queryList) {
-            if (parentFacetValueId == null)
+            if (parentFacetValueId == null){
                 objectQuery = String.format("select DISTINCT ?z where { <%s> <%s> ?z . " + q.replace("?x", "<" + subject + ">") + "} ", subject,
                         toggledFacetName);
-            else
+            }
+            else {
                 objectQuery = String.format("select DISTINCT ?z where { ?%s <%s> ?z . " + q.replace("?x", "<" + subject + ">") + "} ",
                         parentFacetValueId, toggledFacetName);
+            }
 
             if (parentFacetValueId == null || q.contains(parentFacetValueId)) {
                 tupleIterator = config.getTripleStore().executeQuery(objectQuery, true);
@@ -490,7 +496,7 @@ public class QueryExecutor {
             tupleIterator.dispose();
         }
     }
-
+    /*
     public static FacetName createPredicateWithDataType(String predicate, Configurations config) {
         FacetName facetName = new FacetName();
         facetName.setName(predicate);
@@ -524,7 +530,7 @@ public class QueryExecutor {
                     } catch (NumberFormatException e) {
                         type = PredicateTypeEnum.UNKNOWN;
                     }
-                }
+                } 
                 tupleIterator.next();
             }
             tupleIterator.dispose();
@@ -536,6 +542,157 @@ public class QueryExecutor {
         facetName.setType(type.toString());
         return facetName;
     }
+    */
+    
+    public static FacetName createPredicateWithDataTypeA(String predicate, Configurations config) {
+    	FacetName facetName = new FacetName();
+    	facetName.setName(predicate);
+    	PredicateTypeEnum type = PredicateTypeEnum.UNKNOWN;
+    	String query  = String.format("SELECT DISTINCT ?z WHERE {?x <%s> ?z}", predicate);
+    	ResultSet tupleIterator = config.getTripleStore().executeQuery(query, true);
+    	Float min = Float.POSITIVE_INFINITY;
+    	Float max = Float.NEGATIVE_INFINITY;
+    	Float number;
+        LocalDateTime datetime_min = LocalDateTime.MAX;
+        LocalDateTime datetime_max = LocalDateTime.MIN;
+    	String postfix;
+    	Integer numberOfDateTime = 0;
+    	Integer numberOfNumerics = 0;
+    	if (tupleIterator != null) {
+    		tupleIterator.open();
+	    	String object = tupleIterator.getNativeItem(0);
+			if (object.startsWith("<") && object.endsWith(">")) {
+				type = PredicateTypeEnum.UNKNOWN;
+				facetName.setType(type.toString());
+				return facetName;
+			} else {
+				int first = object.indexOf('"');
+				int last = object.lastIndexOf('"');
+				if (first != last && first > -1 && (last+1 < object.length())) {
+					postfix = object.substring(last + 1, object.length());
+					if (postfix.equals("^^<http://www.w3.org/2001/XMLSchema#dateTime>")) 
+						type = PredicateTypeEnum.XSDDATETIME;
+					else if (postfix.equals("^^<http://www.w3.org/2001/XMLSchema#float>")) {
+						type = PredicateTypeEnum.FLOAT;
+					}
+					else if (postfix.equals("^^<http://www.w3.org/2001/XMLSchema#integer>")) {
+						type = PredicateTypeEnum.INTEGER;
+					}
+					else if (postfix.equals("^^<http://www.w3.org/2001/XMLSchema#double>")){
+						type = PredicateTypeEnum.DOUBLE;
+					}		
+				}
+			}
+			while (tupleIterator.hasNext()) {
+				object = tupleIterator.getItem(0);
+				if (type.equals(PredicateTypeEnum.XSDDATETIME)) {
+		        	try {
+		        		LocalDateTime datetime = LocalDateTime.parse(object, DateTimeFormatter.ISO_DATE_TIME);
+		        		if (datetime.isAfter(datetime_max))
+		        			datetime_max = datetime;
+		        		if (datetime.isBefore(datetime_min))
+		        			datetime_min = datetime;
+		        		numberOfDateTime++;
+		        	} catch (DateTimeParseException e) {
+		        		continue;
+		        	}
+				} else if (type.equals(PredicateTypeEnum.FLOAT) || type.equals(PredicateTypeEnum.DOUBLE) || type.equals(PredicateTypeEnum.INTEGER)) {
+                    try {
+                        number = (float) Float.parseFloat(object);
+                        if (number > max)
+                            max = number;
+                        if (number < min)
+                            min = number;
+                        numberOfNumerics++;
+                    } catch (NumberFormatException e) {
+                    	continue; 
+                    }
+				} else {
+					break;
+				}
+				tupleIterator.next();
+			}
+			tupleIterator.dispose();
+    	}
+        if ( (type.equals(PredicateTypeEnum.FLOAT) || type.equals(PredicateTypeEnum.DOUBLE) || type.equals(PredicateTypeEnum.INTEGER)) && !min.equals(Float.POSITIVE_INFINITY) && !max.equals(Float.NEGATIVE_INFINITY)) {
+            facetName.setMax(max);
+            facetName.setMin(min);
+            facetName.setNumberOfNumerics(numberOfNumerics);
+        } else if (type.equals(PredicateTypeEnum.XSDDATETIME) && !datetime_max.equals(LocalDateTime.MIN) && !datetime_min.equals(LocalDateTime.MAX)) {
+        	facetName.setMaxDateTime(datetime_max);
+        	facetName.setMinDateTime(datetime_min);
+        	facetName.setNumberOfDateTime(numberOfDateTime);
+        }
+		facetName.setType(type.toString());
+		return facetName;
+    }
+    
+    /*
+    public static FacetName createPredicateWithDataType(String predicate, Configurations config) {
+        FacetName facetName = new FacetName();
+        facetName.setName(predicate);
+        PredicateTypeEnum type = PredicateTypeEnum.XSDDATETIME;
+        String query = String.format("SELECT DISTINCT ?z WHERE {?x <%s> ?z}", predicate);
+        ResultSet tupleIterator = config.getTripleStore().executeQuery(query, true);
+        Float min = Float.POSITIVE_INFINITY;
+        Float max = Float.NEGATIVE_INFINITY;
+        Float number;
+        LocalDateTime datetime_min = LocalDateTime.MAX;
+        LocalDateTime datetime_max = LocalDateTime.MIN;
+        Integer numberOfDateTime = 0;
+        if (tupleIterator != null) {
+            tupleIterator.open();
+            while (tupleIterator.hasNext() && !type.equals(PredicateTypeEnum.UNKNOWN)) {
+                String object = tupleIterator.getItem(0);
+                if (type.equals(PredicateTypeEnum.XSDDATETIME)) {
+                	try {
+                		LocalDateTime datetime = LocalDateTime.parse(object, DateTimeFormatter.ISO_DATE_TIME);
+                		if (datetime.isAfter(datetime_max))
+                			datetime_max = datetime;
+                		if (datetime.isBefore(datetime_min))
+                			datetime_min = datetime;
+                		numberOfDateTime++;
+                	} catch (DateTimeParseException e) {
+                		type = PredicateTypeEnum.INTEGER;
+                	}
+                }
+                if (type.equals(PredicateTypeEnum.INTEGER)) {
+                    try {
+                        number = (float) Integer.parseInt(object);
+                        if (number > max)
+                            max = number;
+                        if (number < min)
+                            min = number;
+                    } catch (NumberFormatException e) {
+                        type = PredicateTypeEnum.FLOAT;
+                    }
+                } else if (type.equals(PredicateTypeEnum.FLOAT)) {
+                    try {
+                        number = Float.parseFloat(object);
+                        if (number > max)
+                            max = number;
+                        if (number < min)
+                            min = number;
+                    } catch (NumberFormatException e) {
+                        type = PredicateTypeEnum.UNKNOWN;
+                    }
+                } 
+                tupleIterator.next();
+            }
+            tupleIterator.dispose();
+        }
+        if ((type.equals(PredicateTypeEnum.INTEGER) || type.equals(PredicateTypeEnum.FLOAT)) && !min.equals(Float.POSITIVE_INFINITY) && !max.equals(Float.NEGATIVE_INFINITY)) {
+            facetName.setMax(max);
+            facetName.setMin(min);
+        } else if (type.equals(PredicateTypeEnum.XSDDATETIME) && !datetime_max.equals(LocalDateTime.MIN) && !datetime_min.equals(LocalDateTime.MAX)) {
+        	facetName.setMaxDateTime(datetime_max);
+        	facetName.setMinDateTime(datetime_min);
+        	facetName.setNumberOfDateTime(numberOfDateTime);
+        }
+        facetName.setType(type.toString());
+        return facetName;
+    }
+   */
 
     public static void testQuery(Configurations config) {
         String query = "SELECT ?x ?z WHERE {?x <long> ?z . FILTER (?z >= \"0\")}";

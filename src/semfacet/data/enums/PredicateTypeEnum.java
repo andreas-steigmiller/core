@@ -6,7 +6,7 @@ package semfacet.data.enums;
 //TODO: Add all owl types
 public enum PredicateTypeEnum {
 
-    UNKNOWN("0"), INTEGER("1"), FLOAT("2");
+    UNKNOWN("0"), INTEGER("1"), DOUBLE("2"), FLOAT("3"), XSDDATETIME("4");
 
     private final String text;
 

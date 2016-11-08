@@ -16,6 +16,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+import org.apache.log4j.Logger;
 
 import semfacet.data.enums.FacetValueEnum;
 import semfacet.data.structures.Configurations;
@@ -30,6 +31,7 @@ import semfacet.ranking.RankingMap;
 import semfacet.search.SearchIndex;
 
 public class QueryManager {
+	static Logger LOG = Logger.getLogger(QueryManager.class.getName());
 
     public static Response getInitialFacetData(String searchKeywords, Configurations config) {
         Response answer = new Response();
@@ -184,6 +186,10 @@ public class QueryManager {
             fn.setType(facetTypeMap.get(fn.getName()).getType());
             fn.setMin(facetTypeMap.get(fn.getName()).getMin());
             fn.setMax(facetTypeMap.get(fn.getName()).getMax());
+            fn.setNumberOfNumerics(facetTypeMap.get(fn.getName()).getNumberOfNumerics());
+            fn.setMaxDateTime(facetTypeMap.get(fn.getName()).getMaxDateTime());
+            fn.setMinDateTime(facetTypeMap.get(fn.getName()).getMinDateTime());
+            LOG.info("facetname type: " +fn.getLabel() +' ' + fn.getType());
         }
         Ranking.sortFacetNamesAlphabetically(facetNames, true);
         answer.setSize(retrievedIds.size());
@@ -246,6 +252,7 @@ public class QueryManager {
         List<Snippet> snipets = getSnipets(idsForPage, config);
         answer.setSize(retrievedIds.size());
         answer.setSnippets(snipets);
+        LOG.info("querylist: " + queryList.toString());
         return answer;
     }
 
@@ -495,21 +502,38 @@ public class QueryManager {
 
     private static List<FacetValue> getFacetValuesHybridAlg(String toggledFacetName, String parentFacetValueId, List<String> queryList,
             Set<String> retrievedIds, Configurations config) {
+    	LOG.info("Doing facetvalues: ");
+    	LOG.info("Query list: ");
+    	for (int i = 0; i< queryList.size(); i++){
+    		LOG.info(queryList.get(i));
+    	}
         List<FacetValue> facetValues;
-        int oracle = 100;
+        //int oracle = 100;
+        /*
         if (retrievedIds.size() > oracle) {
+        	LOG.info("We go here: ");
             facetValues = getFacetValuesMinimizeAlg(toggledFacetName, queryList, retrievedIds, config);
         } else {
             facetValues = getFacetValuesExaustiveAlg(toggledFacetName, parentFacetValueId, queryList, retrievedIds, config);
         }
+        */
+        facetValues = getFacetValuesExaustiveAlg(toggledFacetName, parentFacetValueId, queryList, retrievedIds, config);
+        LOG.info("Done facetvalues: ");
         return facetValues;
     }
 
     public static List<FacetValue> getFacetValuesMinimizeAlg(String toggledFacetName, List<String> queryList, Set<String> retrievedIds,
             Configurations config) {
+    	LOG.info("querylist: " + queryList.get(0));
+    	LOG.info("size of querylist: " + queryList.size());
+    	LOG.info("size of retrieved ids: " + retrievedIds.size());
+    	LOG.info("some retrieved ids: " + retrievedIds.iterator().next());
         List<FacetValue> facetValues = new ArrayList<FacetValue>();
         Set<String> allObjects = QueryExecutor.getObjectsFromStore(queryList, toggledFacetName, config);
+        LOG.info("Done objects: " + allObjects.size());
+        LOG.info("some objects: " + retrievedIds.iterator().next());
         Set<String> allClasses = QueryExecutor.getClassesFromStore(queryList, toggledFacetName, config);
+        LOG.info("Done classes: " + allClasses.size());
         Set<String> facetClasses = new HashSet<String>();
         Set<String> facetObjects = new HashSet<String>();
         for (String value : allClasses) {
@@ -524,6 +548,7 @@ public class QueryManager {
                 }
             }
         }
+        LOG.info("Done itereting over classes: ");
         for (String value : allObjects) {
             boolean hide = true;
             for (String query : queryList) {
@@ -535,10 +560,12 @@ public class QueryManager {
                 }
             }
         }
+        LOG.info("Done iterating over objects: ");
 
         facetValues.addAll(getFacetValueHierarchy(config, facetClasses, facetObjects, false));
         return facetValues;
     }
+    
 
     private static Set<String> getFocusIdsSpecialCases(Set<FacetValue> classes, String searchKeywords, List<String> queryList, Configurations config) {
         Set<String> retrievedIds = new HashSet<String>();

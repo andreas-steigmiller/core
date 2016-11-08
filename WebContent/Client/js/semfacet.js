@@ -26,6 +26,7 @@ $(window).scroll(function() {
             $.getJSON(SERVER_URL + "getSnippets", {
                 selected_facet_values: JSON.stringify(selected_facet_values_json),
                 range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+                datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
                 search_keywords: $("#searchText").val(),
                 active_page: NEXT_PAGE
             }, function(data) {
@@ -269,7 +270,7 @@ updateSliderSpan = function(el) {
 	element.siblings("div").first().html(element.val());
 	executeUnselectedFacetValueQuery();
 }
-
+/*
 generateSliderDiv = function(min, max, facet_name, facet_id) {
 	var step = (max - min) / 100;
 	var mid = min + (max - min) / 2;
@@ -278,7 +279,225 @@ generateSliderDiv = function(min, max, facet_name, facet_id) {
     			'<div style="text-align:center;">' + mid + '</div>' +
 			'</div>'
 }
+*/
+generateSliderDiv = function(el){
+	element = $(el);
+	var facet_values_element = element.parent().siblings(".facet_values").first();
+	var facet_name = element.attr("facet_name");
+	var facet_id = element.attr("facet_id");
+	var facet_type = element.attr("facet_type");
+	var n_min = element.attr("min");
+	var n_max = element.attr("max");
+	var numberofnums = element.attr("numberOfNumerics")
+	if (facet_type == '1') {
+			facet_values_element.html('<div class = "range" id = "' + facet_id + '" facet_name ="' + facet_name + '" facet_id ="' + facet_id + '">' +
+				'<div>' +
+				' <div style ="text-align:center; margin-left: 5px; margin-bottom: 10px" ><span class = "range1">' + parseInt(n_min)  + '</span> - <span class = "range2">' + parseInt(n_max)  +  '</span></div>'+
+				'<div class = "range_numeric" style = "margin-left: 20px; margin-right: 20px; margin-bottom: 15px"> </div>' + '</div>' +
+				'</div>');
+	} else if (facet_type == '2' || facet_type == '3') {
+			facet_values_element.html('<div class = "range" id = "' + facet_id + '" facet_name ="' + facet_name + '" facet_id ="' + facet_id + '">' +
+				' <div style ="text-align:center; margin-left: 5px; margin-bottom: 10px" ><span class = "range1">' + parseFloat(n_min)  + '</span> - <span class = "range2">' + parseFloat(n_max)  +  '</span></div>'+
+				'<div class = "range_numeric" style = "margin-left: 20px; margin-right: 20px; margin-bottom: 15px"> </div>' + '</div>' );
+	}
+	populateSliderFacet(element,n_min, n_max, numberofnums);
+}
 
+populateSliderFacet = function(element, n_min, n_max, numberofnums) {
+	var facet_id = element.attr("facet_id");
+	var facet_type = element.attr("facet_type");
+	var rangeSlider = document.getElementById(facet_id).getElementsByClassName('range_numeric')[0]; 
+	if (facet_type == '1') {
+		var numberOfInt = Math.round((parseInt(n_max) - parseInt(n_max))/parseInt(numberofnums));
+		noUiSlider.create(rangeSlider, {
+			start: [parseInt(n_min), parseInt(n_max)],
+			connect: true,
+			step: numberOfInt, 
+			range: {
+				'min': [parseInt(n_min)] ,
+				'max': [parseInt(n_max)] 
+				} 
+		});
+	} else if (facet_type == '2' || facet_type == '3') {
+		var numberOfFloat = (parseFloat(n_max) - parseFloat(n_max))/parseFloat(numberofnums);
+		noUiSlider.create(rangeSlider, {
+			start: [parseFloat(n_min), parseFloat(n_max)],
+			connect: true,
+			step: numberOfFloat, 
+			range: {
+				'min': [parseFloat(n_min)] ,
+				'max': [parseFloat(n_max)] 
+				} 
+		});
+	}
+	
+	rangeSlider.noUiSlider.on('update',function(values){
+							if (facet_type == '1') {
+								$('#' + facet_id).find('.range1').html(Math.round(Number(values[0])));
+								$('#' + facet_id).find('.range2').html(Math.round(Number(values[1])));
+							}	else {
+								$('#' + facet_id).find('.range1').html(Number(values[0]));
+								$('#' + facet_id).find('.range2').html(Number(values[1]));
+							}
+								});
+	rangeSlider.noUiSlider.on('change', function(){executeUnselectedFacetValueQuery();});
+}
+
+
+generateDateTimeSliderDiv = function(el){
+	element = $(el);
+	var facet_values_element = element.parent().siblings(".facet_values").first();
+	var facet_name =  element.attr("facet_name");
+	var facet_id = element.attr("facet_id");
+	var d_min = element.attr("minYear");
+	var d_max = element.attr("maxYear");
+	facet_values_element.html('<div class ="time-range" id = "' + facet_id + '" facet_name ="' + facet_name + '" facet_id = "' + facet_id + '">' + 
+				'<div> <div style="text-align:center;">Year</div> ' + 
+				' <div style ="text-align:center; margin-left: 5px; margin-bottom: 5px" ><span class = "yearrange1">' + parseInt(d_min)  + '</span> - <span class = "yearrange2">' + parseInt(d_max)  +  '</span></div>'+
+				'<div class = "range-years"> </div>' + '</div>' +
+				'<div> <div style="text-align:center;">Month</div> ' +
+				' <div style ="text-align:center; margin-left: 5px; margin-bottom: 5px" ><span class = "monthrange1">' + 01  + '</span> - <span class = "monthrange2">' + 12  +  '</span></div>' +
+				'<div class = "range-months"></div>' + '</div>' +
+				'<div> <div style="text-align:center;">Day</div> ' +
+				' <div style ="text-align:center; margin-left: 5px; margin-bottom: 5px" ><span class = "dayrange1">' + 01  + '</span> - <span class = "dayrange2">' + 31  +  '</span></div>'  +
+				'<div class = "range-days"></div>' + '</div>' +
+				'<div> <div style="text-align:center;">Hour</div> ' +
+				' <div style ="text-align:center; margin-left: 5px; margin-bottom: 5px" ><span class = "hourrange1">' + 00  + '</span> - <span class = "hourrange2">' + 23  +  '</span></div>' +
+				'<div class = "range-hours"></div>' + '</div>' +
+			'</div>');
+	populateDateTimeFacet(element,d_min, d_max);
+}
+
+populateDateTimeFacet = function(element,d_min, d_max){
+	var facet_id = element.attr("facet_id");
+	var yearSlider = document.getElementById(facet_id).getElementsByClassName('range-years')[0];
+	noUiSlider.create(yearSlider, {
+	start: [parseInt(d_min),parseInt(d_max)],
+	connect: true,
+	step: 1,
+	range: {
+		'min': [parseInt(d_min)] ,
+		'max': [parseInt(d_max)] 
+	}
+});
+	
+	
+	var monthSlider = document.getElementById(facet_id).getElementsByClassName('range-months')[0];
+	noUiSlider.create(monthSlider, {
+		start: [1 , 12],
+		connect: true,
+		step: 1,
+		range: {
+			'min': [1],
+			'max': [12]
+		}
+	});
+	
+
+	var daySlider = document.getElementById(facet_id).getElementsByClassName('range-days')[0];
+	noUiSlider.create(daySlider, {
+		start: [1 , 31],
+		connect: true,
+		step: 1,
+		range: {
+			'min': [1],
+			'max': [31]
+		}
+	});
+	
+
+	var hourSlider = document.getElementById(facet_id).getElementsByClassName('range-hours')[0];
+	noUiSlider.create(hourSlider, {
+		start: [0 , 24],
+		connect: true,
+		step: 1,
+		range: {
+			'min': [0],
+			'max': [23]
+		}
+	});
+	yearSlider.noUiSlider.on('update',function(values){
+							$('#' + facet_id).find('.yearrange1').html(Number(values[0]));
+							$('#' + facet_id).find('.yearrange2').html(Number(values[1]));});
+	yearSlider.noUiSlider.on('change', function(){executeUnselectedFacetValueQuery();});
+	monthSlider.noUiSlider.on('update', function(values){ 
+							$('#' + facet_id).find('.monthrange1').html(Number(values[0]));
+							$('#' + facet_id).find('.monthrange2').html(Number(values[1]));});
+	monthSlider.noUiSlider.on('change', function(){executeUnselectedFacetValueQuery();});
+	daySlider.noUiSlider.on('change',function(values){
+							$('#' + facet_id).find('.dayrange1').html(Number(values[0]));
+							$('#' + facet_id).find('.dayrange2').html(Number(values[1]));
+							executeUnselectedFacetValueQuery(values)});
+	hourSlider.noUiSlider.on('change',function(values){
+							$('#' + facet_id).find('.hourrange1').html(Number(values[0]));
+							$('#' + facet_id).find('.hourrange2').html(Number(values[1]));
+							executeUnselectedFacetValueQuery()});
+}
+
+
+/*
+populateDateTimeFacet = function(d_min, d_max){
+	$(".range-years").slider({
+		range: true,
+		min: d_min,
+		max: d_max,
+		values: [d_min,d_max],
+		slide: function(event, ui) {
+			executeUnselectedFacetValueQuery();
+		}
+	});
+	$(el).find('.range-months', newContent).slider({
+		range: true,
+		min: 1,
+		max: 12,
+		step: 1,
+		values: [1,12],
+		slide: function(event, ui) {
+			executeUnselectedFacetValueQuery();
+		}
+	});
+	$(el).find('.range-days', newContent).slider({
+		range: true,
+		min: 1,
+		max: 31,
+		step: 1,
+		values: [1,31],
+		slide: function(event, ui) {
+			executeUnselectedFacetValueQuery();
+		}
+	});
+	$(el).find('.range-hours', newContent).slider({
+		range: true,
+		min: 0,
+		max: 24,
+		step: 1,
+		values: [0,24],
+		slide: function(event, ui) {
+			executeUnselectedFacetValueQuery();
+		}
+	});
+}
+*/
+
+makeJsonFromRangeSliders = function() {
+	var rangeSliders = [];
+	$(".range").each(function(){
+		if ($(this).is(":visible")) {
+			var numeric = document.getElementById($(this).attr("facet_id")).getElementsByClassName('range_numeric')[0];
+			var min_value = Number(numeric.noUiSlider.get()[0]);
+			var max_value = Number(numeric.noUiSlider.get()[1]);
+			rangeSliders.push({
+				"facet_id": $(this).attr("facet_id"),
+				"facet_name": $(this).attr("facet_name"),
+				"min": min_value,
+				"max": max_value				
+			});	
+	}
+	});
+	return rangeSliders;
+}
+
+/*
 makeJsonFromRangeSliders = function() {
 	var rangeSliders = [];
 	$(".slider_div").each(function() {
@@ -293,6 +512,29 @@ makeJsonFromRangeSliders = function() {
 	});
 	return rangeSliders;
 }
+*/
+
+makeJsonFromRangeDateTimeSliders = function() {
+	var rangedatetimeSliders = [];
+	$(".time-range").each(function(){
+		if ($(this).is(":visible")) {
+			var year = document.getElementById($(this).attr("facet_id")).getElementsByClassName('range-years')[0];
+			var month = document.getElementById($(this).attr("facet_id")).getElementsByClassName('range-months')[0];
+			var day = document.getElementById($(this).attr("facet_id")).getElementsByClassName('range-days')[0];
+			var hour = document.getElementById($(this).attr("facet_id")).getElementsByClassName('range-hours')[0];
+			var min_value = Number(year.noUiSlider.get()[0]) + "-" + ("0" + Number(month.noUiSlider.get()[0])).slice(-2) + "-" +  ("0" + Number(day.noUiSlider.get()[0])).slice(-2) + "T" + ("0" + Number(hour.noUiSlider.get()[0])).slice(-2) + ":" + "00:00";
+			var max_value = Number(year.noUiSlider.get()[1]) + "-" + ("0" + Number(month.noUiSlider.get()[1])).slice(-2) + "-" +  ("0" + Number(day.noUiSlider.get()[1])).slice(-2) + "T" + ("0" + Number(hour.noUiSlider.get()[1])).slice(-2) + ":" + "59:59";
+			rangedatetimeSliders.push({
+				"facet_id": $(this).attr("facet_id"),
+				"facet_name": $(this).attr("facet_name"),
+				"min_value": min_value,
+				"max_value": max_value				
+			});
+		
+	}
+	});
+	return rangedatetimeSliders;
+}
 
 getInitialFacetHeader = function(id, facet_label, type) {
     return  '<h5 style="color:darkslategrey;">Filter by:</h5>' + 
@@ -302,7 +544,7 @@ getInitialFacetHeader = function(id, facet_label, type) {
                     '<a onclick="searchFacetValues(this);">' + 
                         '<img src="Client/img/search.png" style="height:15px; margin-left:5px; margin-top:5px; float:left;" />' + 
                     '</a>' + 
-                    '<h5 style="text-align:center; color: white;">' + facet_label + '</h5>' + 
+                    '<h5 style="text-align:center; color: white;">'  + facet_label + '</h5>' + 
                 '</div>' + 
                 '<input type="text" class="hide" onkeyup="filterText(this);" />' + 
                 '<div class="facet_values" id="facet_0" style="max-height: 200px; overflow-y: scroll;"></div>' + 
@@ -312,10 +554,10 @@ getInitialFacetHeader = function(id, facet_label, type) {
             '</div>';
 }
 
-getFacetHeader = function(id, facet_name, facet_label, facet_type, min, max) {
+getFacetHeader = function(id, facet_name, facet_label, facet_type, min, max, minYear, maxYear, numberofnums) {
     return  '<div class="facet_div" style ="margin-top:0px;margin-bottom:2px;">' +
                 '<div class="facet_header" style="background-color: #1B7488;">' +
-                    '<a style="color: white;font-size:12px;margin-top:7px; margin-left:3px; float:left;" onclick="toggleFacetNames(this);" class="unexplored moreLess" facet_id="' + id + '" facet_name="' + facet_name + '" facet_type="' + facet_type +'" min="' + min + '" max="' + max + '"> &#x25B6; </a>' + 
+                    '<a style="color: white;font-size:12px;margin-top:7px; margin-left:3px; float:left;" onclick="toggleFacetNames(this);" class="unexplored moreLess" facet_id="' + id + '" facet_name="' + facet_name + '" facet_type="' + facet_type + '" numberOfNumerics="' + numberofnums +'" min="' + min + '" max="' + max +'" minYear="' + minYear + '" maxYear="' + maxYear + '"> &#x25B6; </a>' + 
                     '<a onclick="refreshFacetValues(this);">' +
                         '<img src="Client/img/refresh.png" style="height:15px; margin-left:5px; margin-top:5px; float:left;" />' + 
                     '</a>' + 
@@ -446,6 +688,7 @@ executeGetFacetValuesQuery = function(element) {
     $.getJSON(SERVER_URL + "getFacetValues", {
         selected_facet_values: JSON.stringify(selected_facet_values_json),
         range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+        datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
         search_keywords: $("#searchText").val(),
         toggled_facet_name: $(element).attr("facet_name"),
         parent_checkbox_id: getParentCheckboxId($(element).attr("facet_id"))
@@ -502,6 +745,7 @@ getFacetNames = function() {
         $.getJSON(SERVER_URL + "getFacetNames", {
             selected_facet_values: JSON.stringify(selected_facet_values_json),
             range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+            datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
             search_keywords: $("#searchText").val()
         }, function(data) {
             try {
@@ -512,7 +756,8 @@ getFacetNames = function() {
                     generateFacetNames(data);
                 }
             } catch (err) {
-                cleanPage();
+            	$("#facets").append('<div>' + err + '</div>')
+                //cleanPage();
             }
         });
     }
@@ -524,8 +769,14 @@ generateFacetNames = function(data) {
         var facet_label = data.facetNames[i].label;
         if (facet_label == null || facet_label == "")
             facet_label = data.facetNames[i].name;
-        var facet_data = getFacetHeader(i + 1, data.facetNames[i].name, facet_label, data.facetNames[i].type, data.facetNames[i].min, data.facetNames[i].max);
+        if (data.facetNames[i].hasOwnProperty('minDateTime') && data.facetNames[i].hasOwnProperty('maxDateTime')){
+        	//var content = $('#facets').find("a[facet_id='" + (i+1) + "']").first().data('minDateTime');
+        	var minYear = data.facetNames[i].minDateTime.date.year;
+        	var maxYear = data.facetNames[i].maxDateTime.date.year;
+        }
+        var facet_data = getFacetHeader(i + 1, data.facetNames[i].name, facet_label, data.facetNames[i].type, data.facetNames[i].min, data.facetNames[i].max, minYear, maxYear, data.facetNames[i].numberOfNumerics);
         $("#facets").append(facet_data);
+
     }
 }
 
@@ -597,6 +848,7 @@ executeHideUnhideFacetValues = function(selected_value) {
         data: {
             selected_facet_values: JSON.stringify(selected_facet_values_json),
             range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+            datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
             toggled_facet_value_id: $(selected_value).attr("id"),
             search_keywords: $("#searchText").val(),
             same_level_siblings: JSON.stringify(same_level_sibling_json),
@@ -611,7 +863,7 @@ executeHideUnhideFacetValues = function(selected_value) {
                     showHideFacetName(data.facetNames[i].hidden, data.facetNames[i].id);
                 $('#preloader').hide();
             } catch (err) {
-                //cleanPage();
+                cleanPage();
             }
         }
     });
@@ -658,6 +910,7 @@ executeSelectedFacetValueQuery = function(selected_value) {
         $.getJSON(SERVER_URL + "getSelectedFacetValueData", {
             selected_facet_values: JSON.stringify(selected_facet_values_json),
             range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+            datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
             toggled_facet_value_id: $(selected_value).attr("id"),
             search_keywords: $("#searchText").val()
         }, function(data) {
@@ -688,10 +941,10 @@ generateNestedFacetNames = function(data, selected_value) {
     }
 }
 
-getNestedFacetHeader = function(id, facet_name, facet_label, facet_type, min, max) {
+getNestedFacetHeader = function(id, facet_name, facet_label, facet_type, min, max, minYear, maxYear) {
     return  '<div class="facet_div" style ="margin-left:20px;">' + 
                 '<div class="facet_header">' + 
-                    '<a style="font-size:12px; margin-right:10px; margin-top:7px; float:left; display: block" onclick="toggleFacetNames(this);" class="unexplored moreLess" facet_id="' + id + '" facet_name="' + facet_name+ '" facet_type="' + facet_type + '" min="' + min +'" max="' + max + '"> &#x25B6; </a>' + 
+                    '<a style="font-size:12px; margin-right:10px; margin-top:7px; float:left; display: block" onclick="toggleFacetNames(this);" class="unexplored moreLess" facet_id="' + id + '" facet_name="' + facet_name+ '" facet_type="' + facet_type + '" min="' + min +'" max="' + max + '" minYear="' + minYear +'" maxYear="' + maxYear + '"> &#x25B6; </a>' + 
                     '<a onclick="refreshFacetValues(this);">' + 
                         '<img src="Client/img/refresh_black.png" style="height:15px; margin-top:5px; float:left;" />' + 
                     '</a>' + 
@@ -712,15 +965,19 @@ toggleFacetNames = function(el) {
     if (element.hasClass("unexplored")) {
         element.removeClass("unexplored");
         element.html("&#x25BC;");
-        if (element.attr("facet_type") == 1 || element.attr("facet_type") == 2) {
-        	element.parent().siblings(".facet_values").first().html(generateSliderDiv(element.attr("min"), element.attr("max"), element.attr("facet_name"), element.attr("facet_id")));
+        if (element.attr("facet_type") == 1 || element.attr("facet_type") == 2 || element.attr("facet_type") == 3) {
+        	generateSliderDiv(el);
+        	//element.parent().siblings(".facet_values").first().html(generateSliderDiv(element.attr("min"), element.attr("max"), element.attr("facet_name"), element.attr("facet_id")));
+        } else if (element.attr("facet_type") == 4) { 
+        	generateDateTimeSliderDiv(el);
+        	//element.parent().siblings(".facet_values").first().html(generateDateTimeSliderDiv(element.attr("minDateTime"), element.attr("maxDateTime", element.attr("facet_name"), element.attr("facet_id")));
         } else {
         	executeGetFacetValuesQuery(el);
     	}
     } else if (element.hasClass("more")) {
         element.removeClass("more");
         element.html("&#x25BC;");
-        if (element.attr("facet_type") == 1 || element.attr("facet_type") == 2) {
+        if (element.attr("facet_type") == 1 || element.attr("facet_type") == 2 || element.attr("facet_type") == 3 ||  element.attr("facet_type") == 4) {
         	element.parent().siblings(".facet_values").first().show();
         } else {
 	        element.parent().siblings(".facet_values").find("li").each(function() {
@@ -731,7 +988,7 @@ toggleFacetNames = function(el) {
     } else {
         element.addClass("more");
         element.html("&#x25B6;");
-        if (element.attr("facet_type") == 1 || element.attr("facet_type") == 2) {
+        if (element.attr("facet_type") == 1 || element.attr("facet_type") == 2 || element.attr("facet_type") == 3 ||  element.attr("facet_type") == 4) {
         	element.parent().siblings(".facet_values").first().hide();
         } else {
 	        element.parent().siblings(".facet_values").find("li").each(function() {
@@ -770,6 +1027,7 @@ executeUnselectedFacetValueQuery = function() {
         $.getJSON(SERVER_URL + "getUnselectedFacetValueData", {
             selected_facet_values: JSON.stringify(selected_facet_values_json),
             range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+            datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
             search_keywords: $("#searchText").val()
         }, function(data) {
             try {
@@ -835,6 +1093,7 @@ executeFocusQuery = function() {
         focus_values: JSON.stringify(seleced_focus_values_json),
         selected_facet_values: JSON.stringify(selected_facet_values_json),
         range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+        datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
         search_keywords: $("#searchText").val()
     }, function(data) {
         try {

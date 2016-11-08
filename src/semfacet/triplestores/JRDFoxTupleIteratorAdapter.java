@@ -67,6 +67,17 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 			return null;
 		}
 	}
+	
+	public String getNativeItem(int index) {
+		try {
+			String result  = iterator.getGroundTerm(index).toString();
+			return result;
+		} catch (JRDFStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} 
+	}
 
 	@Override
 	public boolean isIndividual(int index) {

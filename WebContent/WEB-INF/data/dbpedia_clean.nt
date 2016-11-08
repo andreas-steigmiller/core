@@ -1,3 +1,11 @@
+@base <http://yago-knowledge.org/resource/> .
+@prefix dbp: <http://dbpedia.org/ontology/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
 <Ulm> <comment> "Ulm is a city in the federal German state of Baden-Wrttemberg, situated on the River Danube . The city, whose population is estimated at 120,000 (2006), forms an urban district of its own and is the administrative seat of the Alb-Donau district. Ulm, founded around 850, is rich in history and traditions as a former Free Imperial City. Today, it is an economic centre due to its varied industries, and it is the seat of a university (University of Ulm, founded in 1967)."@en .
 <Ingolstadt> <comment> "Ingolstadt is a city in the Free State of Bavaria, in the Federal Republic of Germany. It is located along the banks of the Danube River, in the center of Bavaria. As at 31 March 2011, Ingolstadt had 125,407 citizens. It is part of the Munich Metropolitan Area, which has a total population of more than 5 million. The Illuminati, a Bavarian secret society, was founded in Ingolstadt in the late 18th century."@en .
 <Regensburg> <comment> "Regensburg (historically also Ratisbon, from Celtic Ratisbona, Latin: Castra Regina) is a city in Bavaria, Germany, located at the confluence of the Danube and Regen rivers, at one of the northernmost points of the Danube. To the east lies the Bavarian Forest. Regensburg is the capital of the Bavarian administrative region Upper Palatinate. The large medieval centre of the city is a UNESCO World Heritage Site."@en .

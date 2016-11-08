@@ -48,3 +48,28 @@ ol {
 .hide {
 	display:none!important;
 }
+
+.time-range {
+	margin-top: 10px;
+	margin-left: -10px;
+}
+
+.range-years {
+	margin-left: 30px;
+	margin-right: 25px;
+}
+
+.range-months {
+	margin-left: 30px;
+	margin-right: 25px;
+}
+
+.range-days {
+	margin-left: 30px;
+	margin-right: 25px;
+}
+
+.range-hours {
+	margin-left: 30px;
+	margin-right: 25px;
+}

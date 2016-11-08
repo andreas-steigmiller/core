@@ -111,15 +111,18 @@ public class FeedService {
     @Path("/getFacetNames")
     @Produces("application/json")
     public String getFacetNames(@QueryParam("search_keywords") String searchKeywords, @QueryParam("selected_facet_values") String selectedValues,
-            @QueryParam("range_sliders") String rangeSliders) {
+            @QueryParam("range_sliders") String rangeSliders, @QueryParam("datetime_sliders") String rangedatetimeSliders) {
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         Response result = QueryManager.getInitialFacetNames(queryList, searchKeywords, config);
         Gson gson = new Gson();
+        LOG.info("json: " + gson.toJson(result));
         return gson.toJson(result);
     }
 
@@ -146,16 +149,18 @@ public class FeedService {
     @Path("/getFacetValues")
     @Produces("application/json")
     public String getFacetValues(@QueryParam("search_keywords") String searchKeywords, @QueryParam("selected_facet_values") String selectedValues,
-            @QueryParam("range_sliders") String rangeSliders, @QueryParam("toggled_facet_name") String facetName,
+            @QueryParam("range_sliders") String rangeSliders, @QueryParam("datetime_sliders") String rangedatetimeSliders, @QueryParam("toggled_facet_name") String facetName,
             @QueryParam("parent_checkbox_id") String parentFacetValueId) {
         if (parentFacetValueId.equals("null"))
             parentFacetValueId = null;
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         List<FacetValue> result = QueryManager.getFacetValues(facetName, parentFacetValueId, queryList, searchKeywords, config);
         Gson gson = new Gson();
         return gson.toJson(result);
@@ -188,14 +193,16 @@ public class FeedService {
     @Path("/getSelectedFacetValueData")
     @Produces("application/json")
     public String getSelectedFacetValueData(@QueryParam("search_keywords") String searchKeywords,
-            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders,
+            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders,@QueryParam("datetime_sliders") String rangedatetimeSliders,
             @QueryParam("toggled_facet_value_id") String toggledValueId) {
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         FacetValue selectedFacetValue = ClientDataManager.getFacetValueFromId(toggledValueId, values);
         Response result = QueryManager.getDataForSelectedValue(selectedFacetValue, searchKeywords, queryList, config);
         Utils.logUserActivity(searchKeywords, config, selectedFacetValue);
@@ -220,13 +227,16 @@ public class FeedService {
     @Path("/getUnselectedFacetValueData")
     @Produces("application/json")
     public String getUnselectedFacetValueData(@QueryParam("search_keywords") String searchKeywords,
-            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders) {
+            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders,@QueryParam("datetime_sliders") String rangedatetimeSliders) {
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
+        
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         Response result = QueryManager.getDataForUnselectedValue(searchKeywords, queryList, config);
         Gson gson = new Gson();
         return gson.toJson(result);
@@ -251,14 +261,18 @@ public class FeedService {
     @Path("/getDataForFocus")
     @Produces("application/json")
     public String getDataForFocus(@QueryParam("focus_values") String focusVals, @QueryParam("search_keywords") String searchKeywords,
-            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders) {
+            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders, @QueryParam("datetime_sliders") String rangedatetimeSliders) {
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
         List<FacetValue> focusValues = ClientDataManager.getSelectedCheckboxes(focusVals);
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
+        
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
+        
         Response result = QueryManager.getDataForFocus(focusValues, searchKeywords, queryList, config);
         Gson gson = new Gson();
         return gson.toJson(result);
@@ -283,13 +297,17 @@ public class FeedService {
     @Path("/getSnippets")
     @Produces("application/json")
     public String getSnippets(@QueryParam("active_page") String activePage, @QueryParam("search_keywords") String searchKeywords,
-            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders) {
+            @QueryParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders, @QueryParam("datetime_sliders") String rangedatetimeSliders) {
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
+        
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
+        
         Response result = QueryManager.getSnippets(Integer.parseInt(activePage), searchKeywords, queryList, config);
         Gson gson = new Gson();
         return gson.toJson(result);
@@ -323,7 +341,7 @@ public class FeedService {
     @Produces("application/json")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String hideUnhideFacetValues(@FormParam("search_keywords") String searchKeywords,
-            @FormParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders,
+            @FormParam("selected_facet_values") String selectedValues, @QueryParam("range_sliders") String rangeSliders,@QueryParam("datetime_sliders") String rangedatetimeSliders,
             @FormParam("toggled_facet_value_id") String toggledValueId, @FormParam("same_level_siblings") String valuesToHideUnhide,
             @FormParam("facet_names") String predicates) {
         Gson gson = new Gson();
@@ -334,9 +352,15 @@ public class FeedService {
             return gson.toJson(null);
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+ 
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
+        
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+       
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
+        
         List<FacetValue> targetValues = ClientDataManager.getSelectedCheckboxes(valuesToHideUnhide);
         FacetValue toggledFacetValue = ClientDataManager.getFacetValueFromId(toggledValueId, targetValues);
         Response result;
@@ -510,7 +534,7 @@ public class FeedService {
             if (queryLogPath != null)
             	if (queryLogPath.endsWith(")")) {
             		String prefix = queryLogPath.substring(0, queryLogPath.lastIndexOf("("));
-            		int index = Integer.parseInt(queryLogPath.substring(queryLogPath.lastIndexOf("("), queryLogPath.length() - 1));
+            		int index = Integer.parseInt(queryLogPath.substring(queryLogPath.lastIndexOf("(")+1, queryLogPath.length() - 1));
             		config.setQueryLogPath(prefix + "(" + (index + 1) + ")");
             	}
             	else {

@@ -45,7 +45,16 @@ public class PagodaTupleIteratorAdapter implements ResultSet {
             return result;
         }
     }
-
+    
+    @Override
+    public String getNativeItem(int index) {
+    	AnswerTuple answer = iterator.getTuple();
+    	String result = answer.getGroundTerm(index).toString();
+    	if (result != null)
+    		result = result.trim();
+    	return result;
+    }
+    
     @Override
     public boolean isIndividual(int index) {
         //TODO: deal with individuals or remove this method
