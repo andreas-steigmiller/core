@@ -11,7 +11,7 @@ getBounds = function() {
 //GLOBAL VARIABLES
 var FOCUS = false;
 var FOCUS_ID = "";
-var SERVER_URL = "http://localhost:8080/semFacet/rest/WebService/"; //"http://semantic-facets.cs.ox.ac.uk:8080/semFacet/rest/WebService/";
+var SERVER_URL = "rest/WebService/"; //"http://semantic-facets.cs.ox.ac.uk:8080/semFacet/rest/WebService/";
 var NEXT_PAGE = 0;
 var END_RESULTS_REACHED = false;
 var MAP = null;
