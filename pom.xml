@@ -92,12 +92,12 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>cs.ox.uk</groupId>
-			<artifactId>jrdfox</artifactId>
+			<groupId>uk.ac.ox.cs</groupId>
+			<artifactId>JRDFox</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>cs.ox.uk</groupId>
+			<groupId>uk.ac.ox.cs</groupId>
 			<artifactId>pagoda</artifactId>
 			<version>1.0</version>
 		</dependency>
