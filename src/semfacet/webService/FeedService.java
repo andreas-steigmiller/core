@@ -422,81 +422,7 @@ public class FeedService {
      * @see Configurations
      */
 
-    @GET
-    @Path("/setConfigurations")
-    @Produces("application/json")
-    public String setConfigurations(@QueryParam("max") int max, @QueryParam("image") String image, @QueryParam("url") String url,
-            @QueryParam("title") String title, @QueryParam("description") String description, @QueryParam("extra1") String extra1,
-            @QueryParam("extra2") String extra2, @QueryParam("extra3") String extra3, @QueryParam("category") String category,
-            @QueryParam("label") String label, @QueryParam("latitude") String latitude, @QueryParam("longitude") String longitude,
-            @QueryParam("hierarchy") String hierarchy, @QueryParam("conjunctive_predicates") String conFacets,
-            @QueryParam("excluded_predicates") String exclPredicates, @QueryParam("nesting") boolean nesting) {
-        LOG.info("Activating new settings");
-        Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
 
-        config.setSnippetImagePredicate(image);
-        config.setSnippetURLPredicate(url);
-        config.setLatitudePredicate(latitude);
-        config.setLongitudePredicate(longitude);
-        config.setMaxSearchResuls(max);
-        config.setNesting(nesting);
-
-        String snippetDescription = config.getSnippetDescriptionPredicate();
-        String snippetTitle = config.getSnippetTitlePredicate();
-        String snippetExtra1 = config.getSnippetExtra1Predicate();
-        String snippetExtra2 = config.getSnippetExtra2Predicate();
-        String snippetExtra3 = config.getSnippetExtra3Predicate();
-        if (!snippetDescription.equals(description) || !snippetTitle.equals(title) || !snippetExtra1.equals(extra1) || !snippetExtra2.equals(extra2)
-                || !snippetExtra3.equals(extra3)) {
-            config.setSnippetTitlePredicate(title);
-            config.setSnippetDescriptionPredicate(description);
-            config.setSnippetExtra1Predicate(extra1);
-            config.setSnippetExtra2Predicate(extra2);
-            config.setSnippetExtra3Predicate(extra3);
-            config.setSearchIndex(DataContextListener.loadDataToSearchIndex(config));
-        }
-
-        String categoryPredicate = config.getCategoryPredicate();
-        if (!categoryPredicate.equals(category)) {
-            config.setCategoryPredicate(category);
-            config.setIdCategoryMap(QueryExecutor.mapCategoriesToIds(config));
-            LOG.info("Number of ids that have categories : " + config.getIdCategoryMap().size());
-        }
-
-        String labelPredicate = config.getLabelPredicate();
-        if (!labelPredicate.equals(label)) {
-            config.setLabelPredicate(label);
-            config.setIdLabelMap(QueryExecutor.mapLabelsToIds(config));
-            LOG.info("Number of ids that have labels : " + config.getIdLabelMap().size());
-        }
-
-        String hierarchyPredicate = config.getHierarchyPredicate();
-        if (!hierarchyPredicate.equals(hierarchy)) {
-            config.setHierarchyPredicate(hierarchy);
-            config.setHierarchyMap(QueryExecutor.getHierarchyMap(config));
-            LOG.info("Hierarchy map was created.");
-        }
-
-        String[] conjunctive = conFacets.split(",");
-        Set<String> conjunctivePredicates = new HashSet<String>();
-        for (String predicate : conjunctive)
-            conjunctivePredicates.add(predicate);
-        config.setConjunctivePredicates(conjunctivePredicates);
-
-        String[] excluded = exclPredicates.split(",");
-        Set<String> excludedPredicates = new HashSet<String>();
-        for (String predicate : excluded)
-            excludedPredicates.add(predicate);
-
-        config.setExcludedPredicates(excludedPredicates);
-        DataContextListener.setDefaultExcludedPredicates(excludedPredicates, config);
-
-        context.setAttribute(DataContextListener.CONFIGURATIONS, config);
-        JsonMessage message = new JsonMessage();
-        message.setSuccess("Settings were successfully updated.");
-        Gson gson = new Gson();
-        return gson.toJson(message);
-    }
 
     /**
      * This method allows user to upload new data and ontology files and set
@@ -515,65 +441,7 @@ public class FeedService {
      * @return Json message if the operation was successful or not.
      */
 
-    @POST
-    @Path("/uploadData")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
-    public String uploadFile(@FormDataParam("data_file") InputStream dataInputStream,
-            @FormDataParam("data_file") FormDataContentDisposition dFileDetail, @FormDataParam("ontology_file") InputStream ontologyInputStream,
-            @FormDataParam("ontology_file") FormDataContentDisposition oFileDetail, @FormDataParam("store_type") String storeType) {
-        LOG.info("New file upload started");
-        Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
-        JsonMessage message = new JsonMessage();
-        Gson gson = new Gson();
-        try {
-            config.getTripleStore().dispose();
-            config.setStoreType(storeType);
-            String queryLogPath = config.getQueryLogPath();
-            if (queryLogPath != null)
-            	if (queryLogPath.endsWith(")")) {
-            		String prefix = queryLogPath.substring(0, queryLogPath.lastIndexOf("("));
-            		int index = Integer.parseInt(queryLogPath.substring(queryLogPath.lastIndexOf("(")+1, queryLogPath.length() - 1));
-            		config.setQueryLogPath(prefix + "(" + (index + 1) + ")");
-            	}
-            	else {
-            		config.setQueryLogPath(queryLogPath + "(1)");
-            	}
-            File ontologyFile = Utils.streamTofile(ontologyInputStream, oFileDetail);
-            File dataFile = Utils.streamTofile(dataInputStream, dFileDetail);
-
-            if (ontologyFile != null)
-                config.setOntologyPath(ontologyFile.getAbsolutePath());
-            else
-                config.setOntologyPath("");
-            if (dataFile != null)
-                config.setDataPath(dataFile.getAbsolutePath());
-            else
-                config.setDataPath("");
-
-            Store store = DataContextListener.getStore(config);
-            store.loadOntology(config.getOntologyPath());
-            store.loadData(dataFile);
-            LOG.info("Number of tuples after import: " + store.getItemsCount());
-            config.setTripleStore(store);
-
-            DataContextListener.loadInMemoryIndexes(config);
-
-        } catch (IOException e) {
-            LOG.error("Failed to load file: " + e.getMessage());
-            message.setError("Failed to load file: " + e.getMessage());
-            return gson.toJson(message);
-        } catch (StoreException e) {
-            LOG.error("Failed to load file: " + e.getMessage());
-            message.setError("Failed to load file: " + e.getMessage());
-            return gson.toJson(message);
-        }
-
-        context.setAttribute(DataContextListener.CONFIGURATIONS, config);
-        message.setSuccess("File was successfully loaded.");
-        return gson.toJson(message);
-    }
-
+ 
     /**
      * This method returns a triple store view including all distinct
      * predicates.
