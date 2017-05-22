@@ -2,6 +2,7 @@ package semfacet.triplestores;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openrdf.model.Resource;
@@ -43,7 +44,12 @@ public class SesameAdapter implements Store {
         } catch (RepositoryException | RDFParseException | IOException e) {
             throw new StoreException(e.getMessage());
         }
-
+    }
+    
+    @Override
+    public void loadData(String dataPath) throws StoreException {
+    	File file = new File(dataPath); 
+    	loadData(file);
     }
 
     @Override
@@ -55,6 +61,11 @@ public class SesameAdapter implements Store {
         } catch (RepositoryException | RDFParseException | IOException e) {
             throw new StoreException(e.getMessage());
         }
+    }
+    
+    @Override
+    public void loadAggregateFacts(Set<String> allpredicates){
+    	
     }
 
     @Override

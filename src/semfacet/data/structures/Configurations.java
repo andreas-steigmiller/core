@@ -47,6 +47,8 @@ public class Configurations {
     @Expose
     private boolean nesting;
     @Expose
+    private boolean aggregates;
+    @Expose
     private Set<String> conjunctivePredicates;
     @Expose
     private Set<String> excludedPredicates;
@@ -56,7 +58,8 @@ public class Configurations {
     private long allTriples;
     @Expose
     private String memory;
-
+    
+    private Set<String> excludedAggregatePredicates;
     private String dataPath;
     private String ontologyPath;
     private Store tripleStore;
@@ -129,6 +132,14 @@ public class Configurations {
 
     public void setNesting(boolean nesting) {
         this.nesting = nesting;
+    }
+    
+    public boolean isAggregate() {
+    	return aggregates;
+    }
+    
+    public void setAggregates(boolean aggregates) {
+    	this.aggregates = aggregates;
     }
 
     public SearchIndex getSearchIndex() {
@@ -241,6 +252,14 @@ public class Configurations {
 
     public void setExcludedPredicates(Set<String> excludedPredicates) {
         this.excludedPredicates = excludedPredicates;
+    }
+    
+    public Set<String> getExcludedAggregatePredicates() {
+    	return excludedAggregatePredicates;
+    }
+    
+    public void setExcludedAggregatePredicates(Set<String> excludedAggregatePredicates) {
+    	this.excludedAggregatePredicates = excludedAggregatePredicates;
     }
 
     public String getHierarchyPredicate() {

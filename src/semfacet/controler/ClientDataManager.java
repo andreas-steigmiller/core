@@ -5,6 +5,8 @@ package semfacet.controler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -106,8 +108,8 @@ public class ClientDataManager {
     			FacetName fName = new FacetName();
     			fName.setId(ob.get("facet_id").toString());
     			fName.setName(ob.get("facet_name").toString());
-    			fName.setSliderDateTimeMinValue(ob.get("min_value").toString());
-    			fName.setSliderDateTimeMaxValue(ob.get("max_value").toString());
+    			fName.setSliderDateTimeMinValue(LocalDateTime.parse(ob.get("min_value").toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+    			fName.setSliderDateTimeMaxValue(LocalDateTime.parse(ob.get("max_value").toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     			datetimeSliders.add(fName);
     		}
     	} catch (JSONException e) {

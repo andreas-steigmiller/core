@@ -1,6 +1,7 @@
 package semfacet.triplestores;
 
 import java.io.File;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -22,9 +23,15 @@ public class HermitAdapter implements Store {
         if (file!= null && file.exists())
             store.importData(file.getAbsolutePath());
         if (!store.preprocess())
-            LOG.error("The ontology and dataset is inconsistent!");
+            LOG.error("The ontology and dataset are inconsistent!");
     }
-
+    
+    @Override
+    public void loadData(String dataPath) throws StoreException {
+    	File file = new File(dataPath);
+    	loadData(file);
+    }
+    
     @Override
     public void loadOntology(String ontologyPath) throws StoreException {
         try {
@@ -34,7 +41,12 @@ public class HermitAdapter implements Store {
             LOG.error("Ontology was not found.");
         }
     }
-
+    
+    @Override
+    public void loadAggregateFacts(Set<String> allpredicates){
+    	
+    }
+    
     @Override
     public ResultSet executeQuery(String query, boolean computeUpperBound) {
     	if (!computeUpperBound) queryLog.add(query);
