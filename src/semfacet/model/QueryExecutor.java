@@ -222,7 +222,34 @@ public class QueryExecutor {
         }
         return hide;
     }
+    
+    
+    /**
+     * New method added to count the elements in the answer set of the query.
+     * @param query: query to be performed
+     * @param retrievedIds: current result set
+     * @param config: configuration of the system
+     * @return the cardinality of the answer set
+     * 
+     * */
+    public static int getSizeResultSet(String query, Set<String> retrievedIds, Configurations config) {
+    	int result = 0;
+        ResultSet tupleIterator = config.getTripleStore().executeQuery(query, true);
+        if (tupleIterator != null) {
+            tupleIterator.open();
+            while (tupleIterator.hasNext()) {
+                if (retrievedIds.contains(tupleIterator.getItem(0))) {
+                    result++;
+                }
+                tupleIterator.next();
+            }
 
+            tupleIterator.dispose();
+        }
+        return result;
+    }
+    
+    
     public static Set<String> getPredicatesFromStore(List<String> queryList, Configurations config) {
         Set<String> facetNames = new HashSet<String>();
         ResultSet tupleIterator = null;
@@ -247,6 +274,7 @@ public class QueryExecutor {
     public static Set<String> getNestedPredicatesFromStore(List<String> queryList, FacetValue toggledFacetValue, Configurations config) {
         Set<String> facetNames = new HashSet<String>();
         ResultSet tupleIterator = null;
+        
         for (String q : queryList) {
             if (q.contains(toggledFacetValue.getId())) {
                 String query = String.format("select DISTINCT ?y where { ?%s ?y ?z . %s } ", toggledFacetValue.getId(), q);

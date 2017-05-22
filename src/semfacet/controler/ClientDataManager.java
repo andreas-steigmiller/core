@@ -23,7 +23,7 @@ public class ClientDataManager {
         List<FacetValue> values = new ArrayList<FacetValue>();
         JSONArray array;
         try {
-            array = new JSONArray(selectedValues);
+            array = new JSONArray(selectedValues);            
             for (int i = 0; i < array.length(); i++) {
                 JSONObject ob = array.getJSONObject(i);
                 FacetValue value = new FacetValue();
@@ -31,6 +31,8 @@ public class ClientDataManager {
                 value.setPredicate(ob.get("predicate").toString());
                 value.setObject(encodeFacetValues(ob.get("object").toString()));
                 value.setType(ob.get("type").toString());
+                if (ob.has("ranking"))
+                	value.setRanking(Integer.parseInt(ob.get("ranking").toString()));
                 value.setParent(ob.get("parent").toString());
                 if (ob.has("parent_id"))
                     value.setParentId(ob.get("parent_id").toString());

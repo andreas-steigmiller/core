@@ -114,11 +114,15 @@ public class FacetQueryConstructionManager {
         if (getLevel(value.getId()) != 1) {
             String parent_id = getParentId(value.getId());
             FacetValue parent = getParentById(parent_id, values);
-            String parent_type = parent.getType();
-            if (FacetValueEnum.OBJECT.toString().equals(parent_type)) {
-                first_arg = "<" + parent.getObject() + ">";
-            } else {
-                first_arg = "?" + parent_id;
+            if(parent == null)
+            	first_arg = "?" + parent_id;
+            else{
+            	String parent_type = parent.getType();
+            	if (FacetValueEnum.OBJECT.toString().equals(parent_type)) {
+            		first_arg = "<" + parent.getObject() + ">";
+            	} else {
+            			first_arg = "?" + parent_id;
+            	}
             }
         }
 

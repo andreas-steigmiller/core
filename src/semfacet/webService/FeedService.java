@@ -116,13 +116,12 @@ public class FeedService {
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
-        String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
+        String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);        
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         Response result = QueryManager.getInitialFacetNames(queryList, searchKeywords, config);
         Gson gson = new Gson();
-        LOG.info("json: " + gson.toJson(result));
         return gson.toJson(result);
     }
 
@@ -161,7 +160,7 @@ public class FeedService {
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
-        List<FacetValue> result = QueryManager.getFacetValues(facetName, parentFacetValueId, queryList, searchKeywords, config);
+        List<FacetValue> result = QueryManager.getFacetValues(facetName, parentFacetValueId, queryList, searchKeywords, config);        
         Gson gson = new Gson();
         return gson.toJson(result);
     }
@@ -207,6 +206,7 @@ public class FeedService {
         Response result = QueryManager.getDataForSelectedValue(selectedFacetValue, searchKeywords, queryList, config);
         Utils.logUserActivity(searchKeywords, config, selectedFacetValue);
         Gson gson = new Gson();
+        LOG.info("result: " + result);
         return gson.toJson(result);
     }
 
@@ -232,7 +232,6 @@ public class FeedService {
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
-        
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
@@ -354,13 +353,10 @@ public class FeedService {
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
  
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
-        
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
-       
-        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
-        
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);        
         List<FacetValue> targetValues = ClientDataManager.getSelectedCheckboxes(valuesToHideUnhide);
         FacetValue toggledFacetValue = ClientDataManager.getFacetValueFromId(toggledValueId, targetValues);
         Response result;
@@ -368,7 +364,7 @@ public class FeedService {
         if (values.size() > 0)
             result = QueryManager.getDataForHiding(toggledFacetValue, targetValues, facetNames, values, searchKeywords, queryList, config);
         else
-            result = ClientDataManager.unhideAllValues(targetValues, facetNames);
+            result = ClientDataManager.unhideAllValues(targetValues, facetNames);        
         return gson.toJson(result);
     }
 
@@ -423,6 +419,84 @@ public class FeedService {
      * @see Configurations
      */
 
+    @GET
+    @Path("/setConfigurations")
+    @Produces("application/json")
+    public String setConfigurations(@QueryParam("max") int max, @QueryParam("image") String image, @QueryParam("url") String url,
+            @QueryParam("title") String title, @QueryParam("description") String description, @QueryParam("extra1") String extra1,
+            @QueryParam("extra2") String extra2, @QueryParam("extra3") String extra3, @QueryParam("category") String category,
+            @QueryParam("label") String label, @QueryParam("latitude") String latitude, @QueryParam("longitude") String longitude,
+            @QueryParam("hierarchy") String hierarchy, @QueryParam("conjunctive_predicates") String conFacets,
+            @QueryParam("excluded_predicates") String exclPredicates, @QueryParam("predicates_browsing_order") boolean browsing_order, @QueryParam("nesting") boolean nesting) {
+        LOG.info("Activating new settings");
+        Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
+
+        config.setSnippetImagePredicate(image);
+        config.setSnippetURLPredicate(url);
+        config.setLatitudePredicate(latitude);
+        config.setLongitudePredicate(longitude);
+        config.setMaxSearchResuls(max);
+        config.setNesting(nesting);
+        config.setBrowsingOrder(browsing_order);
+
+        String snippetDescription = config.getSnippetDescriptionPredicate();
+        String snippetTitle = config.getSnippetTitlePredicate();
+        String snippetExtra1 = config.getSnippetExtra1Predicate();
+        String snippetExtra2 = config.getSnippetExtra2Predicate();
+        String snippetExtra3 = config.getSnippetExtra3Predicate();
+        if (!snippetDescription.equals(description) || !snippetTitle.equals(title) || !snippetExtra1.equals(extra1) || !snippetExtra2.equals(extra2)
+                || !snippetExtra3.equals(extra3)) {
+            config.setSnippetTitlePredicate(title);
+            config.setSnippetDescriptionPredicate(description);
+            config.setSnippetExtra1Predicate(extra1);
+            config.setSnippetExtra2Predicate(extra2);
+            config.setSnippetExtra3Predicate(extra3);
+            config.setSearchIndex(DataContextListener.loadDataToSearchIndex(config));
+        }
+
+        String categoryPredicate = config.getCategoryPredicate();
+        if (!categoryPredicate.equals(category)) {
+            config.setCategoryPredicate(category);
+            config.setIdCategoryMap(QueryExecutor.mapCategoriesToIds(config));
+            LOG.info("Number of ids that have categories : " + config.getIdCategoryMap().size());
+        }
+
+        String labelPredicate = config.getLabelPredicate();
+        if (!labelPredicate.equals(label)) {
+            config.setLabelPredicate(label);
+            config.setIdLabelMap(QueryExecutor.mapLabelsToIds(config));
+            LOG.info("Number of ids that have labels : " + config.getIdLabelMap().size());
+        }
+
+        String hierarchyPredicate = config.getHierarchyPredicate();
+        if (!hierarchyPredicate.equals(hierarchy)) {
+            config.setHierarchyPredicate(hierarchy);
+            config.setHierarchyMap(QueryExecutor.getHierarchyMap(config));
+            LOG.info("Hierarchy map was created.");
+        }
+
+        String[] conjunctive = conFacets.split(",");
+        Set<String> conjunctivePredicates = new HashSet<String>();
+        for (String predicate : conjunctive)
+            conjunctivePredicates.add(predicate);
+        config.setConjunctivePredicates(conjunctivePredicates);
+
+        String[] excluded = exclPredicates.split(",");
+        Set<String> excludedPredicates = new HashSet<String>();
+        for (String predicate : excluded)
+            excludedPredicates.add(predicate);
+
+        config.setExcludedPredicates(excludedPredicates);
+        DataContextListener.setDefaultExcludedPredicates(excludedPredicates, config);
+
+        context.setAttribute(DataContextListener.CONFIGURATIONS, config);
+        JsonMessage message = new JsonMessage();
+        message.setSuccess("Settings were successfully updated.");
+        Gson gson = new Gson();
+        return gson.toJson(message);
+    }
+    
+    /* Old version
     @GET
     @Path("/setConfigurations")
     @Produces("application/json")
@@ -498,6 +572,7 @@ public class FeedService {
         Gson gson = new Gson();
         return gson.toJson(message);
     }
+    */
 
     /**
      * This method allows user to upload new data and ontology files and set

@@ -47,6 +47,8 @@ public class Configurations {
     @Expose
     private boolean nesting;
     @Expose
+    private boolean predicates_browsing_order;
+    @Expose
     private Set<String> conjunctivePredicates;
     @Expose
     private Set<String> excludedPredicates;
@@ -129,6 +131,14 @@ public class Configurations {
 
     public void setNesting(boolean nesting) {
         this.nesting = nesting;
+    }
+    
+    public boolean isBrowsingOrder() {
+        return predicates_browsing_order;
+    }
+
+    public void setBrowsingOrder(boolean predicates_browsing_order) {
+        this.predicates_browsing_order = predicates_browsing_order;
     }
 
     public SearchIndex getSearchIndex() {

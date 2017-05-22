@@ -77,13 +77,17 @@ public class DataContextListener implements ServletContextListener {
         sc.setAttribute(CONFIGURATIONS, config);
     }
 
+    
+    /** CategoryMap connects individual to their class through predicate type
+     * 
+     *  **/
     public static void loadInMemoryIndexes(Configurations config) {
         LOG.info("Loading data to search index.");
         config.setSearchIndex(loadDataToSearchIndex(config));
         LOG.info("Data was loaded to search index.");
 
         LOG.info("Map categories to ids.");
-        config.setIdCategoryMap(QueryExecutor.mapCategoriesToIds(config));
+        config.setIdCategoryMap(QueryExecutor.mapCategoriesToIds(config));        
         LOG.info("Number of ids that have categories : " + config.getIdCategoryMap().size());
         LOG.info("Categories were mapped.");
 
@@ -98,11 +102,14 @@ public class DataContextListener implements ServletContextListener {
 
         LOG.info("Analyze and set predicate types.");
         Set<String> predicates = QueryExecutor.getAllPredicates(config);
+                
         Map<String, FacetName> facetTypeMap = new HashMap<String, FacetName>();
         for (String predicate : predicates)
             //facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataType(predicate, config));
         	facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataTypeA(predicate, config));
         config.setFacetTypeMap(facetTypeMap);
+        
+        LOG.info("###### facet Type Map #####  \n" + facetTypeMap);
         LOG.info("Predicate types were set.");
     }
 

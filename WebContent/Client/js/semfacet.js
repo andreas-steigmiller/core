@@ -65,7 +65,10 @@ updateNavigationMap = function() {
             var value_id = checked_objects[i];
             var value_name = selected_value.attr("object");
             var value_type = selected_value.attr("value_type");
-            var value_label = selected_value.parent().text();
+            
+            var value_label = selected_value.parent().text().replace(/\(([0-9]+\))/i,"");
+            //old: var value_label = selected_value.parent().text();
+            
             var predicate_name = selected_value.attr("predicate");
             var level = value_id.split("_").length;
             navigation_result += generateNavigationMapPredicate(value_id, predicate_name, checked_objects, (level - 3) * 10);
@@ -116,6 +119,7 @@ makeJsonFromSelectedValues = function(values) {
             "object": element.attr("object"),
             "type": element.attr("value_type"),
             "parent": element.attr("parent"),
+            "ranking": element.attr("ranking"),
             "parent_id": getParentId(values[i])
         });
     }
@@ -619,24 +623,28 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
             value_label = value_name;
         if (value_type == "1" || facet_id == "0")
             value_label = value_label.toUpperCase();
+        
+        var value_ranking = facetValues[i].ranking;
 
         hierarchyMap[value_name] = i;
-
         if (parent_name != value_parent) {
             parent_name = value_parent;
-            if (parent_name == undefined) {
-                facet_values_element.html("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name) + "</li></ol>");
-            } else {
-                var element = $("#checkbox_" + facet_id + "_" + hierarchyMap[parent_name]).parent();
-                if (!element.prev().hasClass("collapsed_triangle"))
-                    $('<span onclick="toggle(this)" class="collapsed_triangle"></span>').insertBefore(element);
-                $("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name) + "</li></ol>").insertAfter(element);
-                element.next().hide();
-            }
+           
+                if (parent_name == undefined ) {
+                    facet_values_element.append("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li></ol>");
+                } else {
+                    var element = $("#checkbox_" + facet_id + "_" + hierarchyMap[parent_name]).parent();
+                    if (!element.prev().hasClass("collapsed_triangle"))
+                        $('<span onclick="toggle(this)" class="collapsed_triangle"></span>').insertBefore(element);
+                    $("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li></ol>").insertAfter(element);
+                    element.next().hide();
+                }
+            
+
 
         } else {
             var element = $("#" + last_value_id).parent().parent();
-            $("<li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name) + "</li>").insertAfter(element);
+            $("<li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li>").insertAfter(element);
         }
         last_value_id = 'checkbox_' + facet_id + '_' + i;
     }
@@ -781,11 +789,22 @@ generateFacetNames = function(data) {
 }
 
 
+//new method with ranking
+generateFacetValueCheckbox = function(value_id, value_name, value_label, value_type, value_parent, predicate_name, value_ranking) {
+    return  '<label for="' + value_id + '" >' + 
+                '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" ranking="' + value_ranking + '" onclick="adjustFacets(this)" class="facet_checkbox">' + cleanFacetValues(value_label) +' ('+ value_ranking +') '+ 
+            '</label>';
+}
+
+// old method
+/*
 generateFacetValueCheckbox = function(value_id, value_name, value_label, value_type, value_parent, predicate_name) {
     return  '<label for="' + value_id + '" >' + 
                 '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" onclick="adjustFacets(this)" class="facet_checkbox">' + cleanFacetValues(value_label) + 
             '</label>';
 }
+*/
+
 
 showHideMoreOptions = function() {
     var selected_values = getSelectedFacetValueIds();
@@ -858,10 +877,10 @@ executeHideUnhideFacetValues = function(selected_value) {
         success: function(data) {
             try {
                 for (var i = 0; i < data.facetValues.length; i++)
-                    showHideValue(data.facetValues[i].isHidden, data.facetValues[i].id);
+                	showHideValue(data.facetValues[i].isHidden, data.facetValues[i].id, data.facetValues[i].ranking);
                 for (var i = 0; i < data.facetNames.length; i++)
-                    showHideFacetName(data.facetNames[i].hidden, data.facetNames[i].id);
-                $('#preloader').hide();
+                	showHideFacetName(data.facetNames[i].hidden, data.facetNames[i].id);
+               $('#preloader').hide();
             } catch (err) {
                 cleanPage();
             }
@@ -880,6 +899,29 @@ showHideFacetName = function(hidden, id) {
     });
 }
 
+
+showHideValue = function(hidden, id, ranking) {
+    var element = $("#" + id).parent().parent();
+    var element2 = $("#" + id);
+    if (hidden && !element.hasClass("hideValue") && !element.attr('checked')) {
+        element.hide();
+        element.addClass("hideValue");
+    } else if (!hidden && element.hasClass("hideValue")){
+        element.removeClass("hideValue");
+        element.show();
+        element2.attr("ranking", (element2.attr("ranking")).replace(/[0-9]+/i,ranking));
+        element.html(element.html().replace(/\(([0-9]+\))/i,"("+ranking+")"));
+    }
+    else{
+    	element2.attr("ranking", (element2.attr("ranking")).replace(/[0-9]+/i,ranking));
+    	element.html(element.html().replace(/\(([0-9]+\))/i,"("+ranking+")"));
+    	if(CHECKBOX_STACK.indexOf(id) != -1){
+    		element.find("input").prop("checked", true);
+    	}
+    }
+}
+
+/*
 showHideValue = function(hidden, id) {
     var element = $("#" + id).parent().parent();
     if (hidden && !element.hasClass("hideValue") && !element.attr('checked')) {
@@ -890,6 +932,7 @@ showHideValue = function(hidden, id) {
         element.show();
     }
 }
+*/
 
 cleanExpandedFacets = function(selected_value) {
     var next = $(selected_value).parent().next();
@@ -921,6 +964,9 @@ executeSelectedFacetValueQuery = function(selected_value) {
                 } else {
                     generateSnippets(data);
                     generateNestedFacetNames(data, selected_value);
+                    
+                    //TODO: we have also to update the counters in the facet values of the response
+                    // we have to use the Stack CHECKBOX_STACK
                 }
             } catch (err) {
                 cleanPage();

@@ -8,10 +8,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import semfacet.data.structures.FacetName;
 import semfacet.data.structures.FacetValue;
 
 public class Ranking {
+	static Logger LOG = Logger.getLogger(Ranking.class.getName());
+	
     public static void sortFacetNamesAlphabetically(List<FacetName> facetNames, final boolean ascOrder) {
         if (facetNames.size() > 0) {
             Collections.sort(facetNames, new Comparator<FacetName>() {
@@ -23,6 +26,23 @@ public class Ranking {
                 }
             });
         }
+    }
+    
+    public static void sortFacetNamesByRank(List<FacetName> facetNames) {
+        if (facetNames.size() > 0) {
+            Collections.sort(facetNames, new Comparator<FacetName>() {
+                public int compare(final FacetName v1, final FacetName v2) {
+                    if(v2.getRanking() > v1.getRanking()){
+                    	return 1;
+                    }
+                    if(v2.getRanking() == v1.getRanking()){
+                    	return 0;
+                    }
+                    else return -1;
+                }
+            });
+        }
+        
     }
 
     public static void sortFacetValuesAlphabetically(List<FacetValue> facetValues) {
@@ -43,5 +63,9 @@ public class Ranking {
                 }
             });
         }
+        
     }
+    
+    
+    
 }

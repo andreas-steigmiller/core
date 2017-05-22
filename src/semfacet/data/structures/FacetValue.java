@@ -111,4 +111,9 @@ public class FacetValue {
     public void setParent(String parent) {
         this.parent = parent;
     }
+    
+    @Override
+    public String toString(){
+    	return "object: " + object + " label: " + label + " predicate: " + predicate + " type: " + type + " ranking: " +ranking;
+    }
 }

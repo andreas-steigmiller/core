@@ -329,6 +329,15 @@
 		  		</div>
 		  		<div class="row" style="margin-top:20px;">
 		  			<div class="large-4 columns">
+		  				<b>Facet predicates order:</b>
+		  			</div>
+		  			<div class="large-8 columns" style="font-size: 12px;">
+		  				<input type="radio" name="predicates_order" value="true" id="alphabetical" style="margin-right:10px;" > alphabetical
+		  				<input type="radio" name="predicates_order" value="false" id="browsing_voted" style="margin-right:10px;margin-left:10px;">browsing-voted
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
 		  				<b>Conjunctive facet predicates:</b>
 		  			</div>
 		  			<div class="large-8 columns">
@@ -533,6 +542,13 @@
           		$("#active_nesting").html("disabled");
           		$("#disabled_nesting").prop("checked", true);
           	}
+          	if (!data.predicates_browsing_order) {
+          		$("#alphabetical").prop("checked", true);
+          	}
+          	else{
+          		$("#browsing_voted").prop("checked", true);
+          	}
+          	
           	$("#active_conjunctive_facets").html(data.conjunctivePredicates.join(", "));
           	$("#active_excluded_predicates").html(data.excludedPredicates.join(", "));
           	$("#active_longitude").html(data.longitudePredicate);
@@ -592,9 +608,14 @@
 		for (var i = 0; i < result.length; i++)
 			options.append($("<option />").val(result[i]).text(result[i]));
 		if ($.isArray(selected)) {
-			for (var i = 0; i < selected.length; i++)
+			for (var i = 0; i < selected.length; i++){
+				if(options.indexOf($("<option />").val(selected).text(selected)) == -1)
+					options.append($("<option />").val(selected).text(selected));
 				options.val(selected[i]);
+			}
 		} else {
+			if(options.indexOf($("<option />").val(selected).text(selected)) == -1)
+				options.append($("<option />").val(selected).text(selected));
 			options.val(selected);
 		}
     }
@@ -618,6 +639,7 @@
       	 hierarchy: $("#settings_hierarchy").val(),
       	 conjunctive_predicates: $("#settings_conjunctive_facets").val().join(","),
       	 excluded_predicates: $("#settings_excluded_predicates").val().join(","),
+      	 predicates_browsing_order: $("#browsing_voted").is(":checked"),
       	 nesting: $("#enabled_nesting").is(":checked")}, function(data) {
       	 	if (data.success!=null) {
 	        	$("#update_setting_success").show();

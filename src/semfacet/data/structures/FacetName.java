@@ -5,6 +5,7 @@
 package semfacet.data.structures;
 
 import java.time.*;
+import java.util.Set;
 
 public class FacetName {
     private String id; // id is retrieved from the client side, currently it is
@@ -24,6 +25,10 @@ public class FacetName {
     private Integer numberOfNumerics;
     private String IntgerMinValue;
     private String IntgerMaxValue;
+    
+    //this fields are necessary for the ranking of facet names
+    private double ranking = 0;
+    private Set<String> answerSet;
 
     public FacetName() {
 
@@ -178,6 +183,30 @@ public class FacetName {
     
     public void setNumberOfDateTime(Integer numberOfDateTime){
     	this.numberOfDateTime = numberOfDateTime;
+    }
+    
+    
+    public double getRanking() {
+        return ranking;
+    }
+
+    public void setRanking(double d) {
+        this.ranking = d;
+    }
+    
+	
+	 public Set<String> getAnswerSet() {
+		return answerSet;
+	}
+
+	public void setAnswerSet(Set<String> answerSet) {
+		this.answerSet = answerSet;
+	}
+    
+	
+    @Override
+    public String toString(){
+    	return "facet name: " + name + " type: " + type + " id: " + id + "ranking: " + ranking;
     }
     
 }
