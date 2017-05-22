@@ -159,7 +159,7 @@ public class JRDFoxAdapter implements Store {
     		store.importText(rules);
     		store.applyReasoning();
     		//store.importText(facts);
-    	} catch (JRDFStoreException e) {
+    	} catch (JRDFoxException e) {
             LOG.error(e.getMessage());
     	}
     }
