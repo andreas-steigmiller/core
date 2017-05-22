@@ -66,10 +66,10 @@ updateNavigationMap = function() {
             var value_id = checked_objects[i];
             var value_name = selected_value.attr("object");
             var value_type = selected_value.attr("value_type");
-            
+
             var value_label = selected_value.parent().text().replace(/\(([0-9]+\))/i,"");
             //old: var value_label = selected_value.parent().text();
-            
+
             var predicate_name = selected_value.attr("predicate");
             var level = value_id.split("_").length;
             navigation_result += generateNavigationMapPredicate(value_id, predicate_name, checked_objects, (level - 3) * 10);
@@ -643,13 +643,13 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
             value_label = value_name;
         if (value_type == "1" || facet_id == "0")
             value_label = value_label.toUpperCase();
-        
+
         var value_ranking = facetValues[i].ranking;
 
         hierarchyMap[value_name] = i;
         if (parent_name != value_parent) {
             parent_name = value_parent;
-           
+
                 if (parent_name == undefined ) {
                     facet_values_element.append("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li></ol>");
                 } else {
@@ -659,7 +659,7 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
                     $("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li></ol>").insertAfter(element);
                     element.next().hide();
                 }
-            
+
 
 
         } else {
@@ -817,8 +817,8 @@ generateFacetNames = function(data) {
 
 //new method with ranking
 generateFacetValueCheckbox = function(value_id, value_name, value_label, value_type, value_parent, predicate_name, value_ranking) {
-    return  '<label for="' + value_id + '" >' + 
-                '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" ranking="' + value_ranking + '" onclick="adjustFacets(this)" class="facet_checkbox">' + cleanFacetValues(value_label) +' ('+ value_ranking +') '+ 
+    return  '<label for="' + value_id + '" >' +
+                '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" ranking="' + value_ranking + '" onclick="adjustFacets(this)" class="facet_checkbox">' + cleanFacetValues(value_label) +' ('+ value_ranking +') '+
             '</label>';
 }
 
@@ -990,7 +990,7 @@ executeSelectedFacetValueQuery = function(selected_value) {
                 } else {
                     generateSnippets(data);
                     generateNestedFacetNames(data, selected_value);
-                    
+
                     //TODO: we have also to update the counters in the facet values of the response
                     // we have to use the Stack CHECKBOX_STACK
                 }
@@ -1263,13 +1263,13 @@ generateSnippets = function(data) {
 getSnippetDiv = function(id, url, title, display, image, description, extra1, extra2, extra3) {
     var keywords = $("#searchText").val();
     return  '<div style="height-min:250px; clear:both;">' +
-                '<a style="font-size:14px" target="_blank" href="' + url + '">' + hiliter(keywords, title) + '</a>' + 
-                '<div style="float:left; min-height: 150px; display: ' + display + '">' + 
-                    '<img src="' + image + '" style="width:100px; margin:4px; max-height:180px"/>' + 
-                '</div>' + 
-                '<div>' + 
-                    '<p style="font-size:14px">' + hiliter(keywords, description) + hiliter(keywords, extra1) + hiliter(keywords, extra2) + hiliter(keywords, extra3) + '</p>' + 
-                '</div>' + 
+                '<a style="font-size:14px" target="_blank" href="' + url + '">' + hiliter(keywords, title) + '</a>' +
+                '<div style="float:left; min-height: 150px; display: ' + display + '">' +
+                    '<img src="' + image + '" style="width:100px; margin:4px; max-height:180px"/>' +
+                '</div>' +
+                '<div>' +
+                    '<p style="font-size:14px">' + hiliter(keywords, description) + hiliter(keywords, extra1) + hiliter(keywords, extra2) + hiliter(keywords, extra3) + '</p>' +
+                '</div>' +
             '</div>';
 }
 /*

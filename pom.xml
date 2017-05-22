@@ -91,6 +91,7 @@
 	</reporting>
 
 	<dependencies>
+		
 		<dependency>
 			<groupId>com.googlecode.aima-java</groupId>
 			<artifactId>aima-core</artifactId>
