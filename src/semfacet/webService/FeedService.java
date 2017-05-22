@@ -125,7 +125,6 @@ public class FeedService {
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         Response result = QueryManager.getInitialFacetNames(queryList, searchKeywords, config);
         Gson gson = new Gson();
-        //LOG.info("json: " + gson.toJson(result));
         return gson.toJson(result);
     }
 
