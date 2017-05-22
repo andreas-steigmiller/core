@@ -17,10 +17,8 @@ public class FacetName {
     private Float max;
     private String sliderValue;
     private boolean hidden;
-    private LocalDateTime minDateTime;
-    private LocalDateTime maxDateTime;
-    private String DateTimeMinValue;
-    private String DateTimeMaxValue;
+    private LocalDateTime DateTimeMinValue;
+    private LocalDateTime DateTimeMaxValue;
     private Integer numberOfDateTime;
     private Integer numberOfNumerics;
     private String IntgerMinValue;
@@ -38,7 +36,7 @@ public class FacetName {
         this.name = name;
         this.label = label;
         if (this.label == null) {
-            String[] temp = name.split("/");
+            String[] temp = name.split("/|#");
             this.label = temp[temp.length - 1];
         }
     }
@@ -46,7 +44,7 @@ public class FacetName {
     public FacetName(String name) {
         this.name = name;
         if (this.label == null) {
-            String[] temp = name.split("/");
+            String[] temp = name.split("/|#");
             this.label = temp[temp.length - 1];
         }
     }
@@ -145,35 +143,19 @@ public class FacetName {
     }
     
     
-    public LocalDateTime getMinDateTime(){
-    	return minDateTime;
-    }
-    
-    public void setMinDateTime(LocalDateTime minDateTime){
-    	this.minDateTime = minDateTime;
-    }
-        
-    public LocalDateTime getMaxDateTime(){
-    	return maxDateTime;
-    }
-    
-    public void setMaxDateTime(LocalDateTime maxDateTime){
-    	this.maxDateTime = maxDateTime;
-    }
-    
-    public String getSliderDateTimeMaxValue(){
+    public LocalDateTime getSliderDateTimeMaxValue(){
     	return DateTimeMaxValue;
     }
     
-    public void setSliderDateTimeMaxValue(String DateTimeMaxValue){
+    public void setSliderDateTimeMaxValue(LocalDateTime DateTimeMaxValue){
     	this.DateTimeMaxValue = DateTimeMaxValue;
     }
     
-    public String getSliderDateTimeMinValue(){
+    public LocalDateTime getSliderDateTimeMinValue(){
     	return DateTimeMinValue;
     }
     
-    public void setSliderDateTimeMinValue(String DateTimeMinValue){
+    public void setSliderDateTimeMinValue(LocalDateTime DateTimeMinValue){
     	this.DateTimeMinValue = DateTimeMinValue;
     }
     

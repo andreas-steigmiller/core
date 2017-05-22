@@ -232,7 +232,7 @@ public class QueryManager {
 
     
     public static Response getInitialFacetNames(List<String> queryList, String searchKeywords, Configurations config) {
-        Response answer = new Response();
+    	Response answer = new Response();
         Set<String> retrievedIds = new HashSet<String>(QueryManager.getIdsFromFacets(config, queryList));
         Set<String> keywordSearchIds = new HashSet<String>(getIdsFromKeywordSearch(searchKeywords, config));
         retrievedIds = Sets.intersection(retrievedIds, keywordSearchIds);
@@ -249,9 +249,9 @@ public class QueryManager {
             fn.setMin(facetTypeMap.get(fn.getName()).getMin());
             fn.setMax(facetTypeMap.get(fn.getName()).getMax());
             fn.setNumberOfNumerics(facetTypeMap.get(fn.getName()).getNumberOfNumerics());
-            fn.setMaxDateTime(facetTypeMap.get(fn.getName()).getMaxDateTime());
-            fn.setMinDateTime(facetTypeMap.get(fn.getName()).getMinDateTime());
-                        
+            fn.setSliderDateTimeMaxValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMaxValue());
+            fn.setSliderDateTimeMinValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMinValue());
+               
             //We remove this line for the evaluation without equal-size            
             if(retrievedIds.size() > 1)
             	fn.setRanking( fn.getRanking()* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
@@ -447,12 +447,11 @@ public class QueryManager {
             fn.setType(facetTypeMap.get(fn.getName()).getType());
             fn.setMin(facetTypeMap.get(fn.getName()).getMin());
             fn.setMax(facetTypeMap.get(fn.getName()).getMax());
-            LOG.info(fn + " " + fn.getRanking());
-            LOG.info("answer set: " + fn.getAnswerSet().size());
-            LOG.info("retrieved IDs: " + retrievedIds.size());
+            fn.setNumberOfNumerics(facetTypeMap.get(fn.getName()).getNumberOfNumerics());
+            fn.setSliderDateTimeMaxValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMaxValue());
+            fn.setSliderDateTimeMinValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMinValue());
             if(retrievedIds.size() > 1)
             	fn.setRanking( fn.getRanking()* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
-            LOG.info(fn + " " + fn.getRanking());
         }
         
         
@@ -478,7 +477,7 @@ public class QueryManager {
         List<Snippet> snipets = getSnipets(idsForPage, config);
         answer.setSize(retrievedIds.size());
         answer.setSnippets(snipets);
-        LOG.info("querylist: " + queryList.toString());
+        //LOG.info("querylist: " + queryList.toString());
         return answer;
     }
 
@@ -990,7 +989,6 @@ public class QueryManager {
 
     private static List<FacetValue> getFacetValuesHybridAlg(String toggledFacetName, String parentFacetValueId, List<String> queryList,
             Set<String> retrievedIds, Configurations config) {
-    	
         List<FacetValue> facetValues;
         /*
         int oracle = 10;
@@ -1002,7 +1000,6 @@ public class QueryManager {
         */
         
         facetValues = getFacetValuesExaustiveAlg(toggledFacetName, parentFacetValueId, queryList, retrievedIds, config);
-        LOG.info("Done facetvalues: ");
         return facetValues;
     }
     

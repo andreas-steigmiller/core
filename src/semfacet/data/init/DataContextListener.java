@@ -55,7 +55,22 @@ public class DataContextListener implements ServletContextListener {
             store = getStore(config);
             store.loadOntology(config.getOntologyPath());
             store.loadData(new File(config.getDataPath()));
+            config.setTripleStore(store);
             LOG.info("Number of triples: " + store.getItemsCount());
+            if (config.isAggregate() && StoresEnum.valueOf(config.getStoreType()) == StoresEnum.JRDFOX) {
+            	Set<String> predicates = QueryExecutor.getAllPredicates(config);
+            	store.loadAggregateFacts(predicates);
+                Set<String> allpredicates = QueryExecutor.getAllPredicates(config);
+                Map<String, FacetName> facetTypeMap = new HashMap<String, FacetName>();
+                for (String predicate : allpredicates)
+                    //facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataType(predicate, config));
+                	facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataTypeA(predicate, config));
+                config.setFacetTypeMap(facetTypeMap);
+                //LOG.info("Predicate types were set.");
+                LOG.info("Number of triples after materializing aggregate information: " + store.getItemsCount());
+            } else if (config.isAggregate() && StoresEnum.valueOf(config.getStoreType())!= StoresEnum.JRDFOX){
+            	LOG.info("Aggregates for this type of store is not supported yet");
+            }
         } catch (StoreException e) {
             e.printStackTrace();
         }
@@ -173,11 +188,25 @@ public class DataContextListener implements ServletContextListener {
                 config.setNesting(false);
             else
                 config.setNesting(true);
+            String aggregates = properties.getProperty("AGGREGATES");
+            if ("disabled".equals(aggregates))
+            	config.setAggregates(false);
+            else
+            	config.setAggregates(true);
             Set<String> conjunctivePredicates = getPredicateSet(properties.getProperty("CONJUNCTIVE_PREDICATES"));
             config.setConjunctivePredicates(conjunctivePredicates);
             Set<String> excludedPredicates = getPredicateSet(properties.getProperty("EXCLUDED_PREDICATES"));
             setDefaultExcludedPredicates(excludedPredicates, config);
             config.setExcludedPredicates(excludedPredicates);
+            Set<String> excludedPredicatesAgg = new HashSet<String>();
+            for (String predicate : excludedPredicates) {
+                excludedPredicatesAgg.add(predicate + "_count");
+            	excludedPredicatesAgg.add(predicate + "_min");
+            	excludedPredicatesAgg.add(predicate + "_sum");
+            	excludedPredicatesAgg.add(predicate + "_max");
+            	excludedPredicatesAgg.add(predicate + "_avg");
+            }
+            config.setExcludedAggregatePredicates(excludedPredicatesAgg);
         } catch (Exception e) {
             LOG.error(e.getMessage());
         } finally {

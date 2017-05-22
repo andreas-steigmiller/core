@@ -260,7 +260,7 @@ public class QueryExecutor {
                 tupleIterator.open();
                 while (tupleIterator.hasNext()) {
                     String predicate = tupleIterator.getItem(0);
-                    if (!config.getExcludedPredicates().contains(predicate)) {
+                    if (!config.getExcludedPredicates().contains(predicate) && !config.getExcludedAggregatePredicates().contains(predicate)) {
                         facetNames.add(predicate);
                     }
                     tupleIterator.next();
@@ -283,7 +283,7 @@ public class QueryExecutor {
                     tupleIterator.open();
                     while (tupleIterator.hasNext()) {
                         String predicate = tupleIterator.getItem(0);
-                        if (!config.getExcludedPredicates().contains(predicate)) {
+                        if (!config.getExcludedPredicates().contains(predicate) && !config.getExcludedAggregatePredicates().contains(predicate)) {
                             facetNames.add(predicate);
                         }
                         tupleIterator.next();
@@ -647,8 +647,8 @@ public class QueryExecutor {
             facetName.setMin(min);
             facetName.setNumberOfNumerics(numberOfNumerics);
         } else if (type.equals(PredicateTypeEnum.XSDDATETIME) && !datetime_max.equals(LocalDateTime.MIN) && !datetime_min.equals(LocalDateTime.MAX)) {
-        	facetName.setMaxDateTime(datetime_max);
-        	facetName.setMinDateTime(datetime_min);
+        	facetName.setSliderDateTimeMaxValue(datetime_max);
+        	facetName.setSliderDateTimeMinValue(datetime_min);
         	facetName.setNumberOfDateTime(numberOfDateTime);
         }
 		facetName.setType(type.toString());

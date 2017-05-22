@@ -1,6 +1,6 @@
 package semfacet.triplestores;
 
-import uk.ac.ox.cs.JRDFox.JRDFStoreException;
+import uk.ac.ox.cs.JRDFox.JRDFoxException;
 import uk.ac.ox.cs.JRDFox.model.Individual;
 import uk.ac.ox.cs.JRDFox.store.TupleIterator;
 
@@ -21,7 +21,7 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 	public boolean hasNext() {
 		try {
 			return iterator.isValid();
-		} catch (JRDFStoreException e) {
+		} catch (JRDFoxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
@@ -31,8 +31,9 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 	@Override
 	public void next() {
 		try {
-			iterator.getNext();
-		} catch (JRDFStoreException e) {
+			//iterator.getNext();
+			iterator.advance();
+		} catch (JRDFoxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -42,7 +43,7 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 	public void open() {
 		try {
 			iterator.open();
-		} catch (JRDFStoreException e) {
+		} catch (JRDFoxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -61,7 +62,7 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 			} else {
 				return result;
 			}
-		} catch (JRDFStoreException e) {
+		} catch (JRDFoxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
@@ -72,7 +73,7 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 		try {
 			String result  = iterator.getGroundTerm(index).toString();
 			return result;
-		} catch (JRDFStoreException e) {
+		} catch (JRDFoxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
@@ -83,7 +84,7 @@ public class JRDFoxTupleIteratorAdapter implements ResultSet {
 	public boolean isIndividual(int index) {
 		try {
 			return iterator.getGroundTerm(index) instanceof Individual;
-		} catch (JRDFStoreException e) {
+		} catch (JRDFoxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;

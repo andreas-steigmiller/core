@@ -7,12 +7,12 @@
   <meta name="viewport" content="width=device-width" />
   <title>SemFacet Manager</title>
   <link rel="shortcut icon" href="Client/img/favicon.ico" type="image/x-icon" />
-  
+
   <link rel="stylesheet" href="Client/css/foundation.css" />
-  
+
 
   <script src="Client/js/vendor/custom.modernizr.js"></script>
-  
+
   <style type="text/css">
 	  .show-page{
 	  	display:block;
@@ -36,7 +36,7 @@
 	<!-- Header and Nav -->
   	<div class="row" style="margin-top:20px;">
   		<div class="large-6 columns">
-	     	<img src="Client/img/SemFacet.png" style="display: block; margin-bottom:10px; height:20px; float:left" /> 
+	     	<img src="Client/img/SemFacet.png" style="display: block; margin-bottom:10px; height:20px; float:left" />
 	     	<span style="color:#1B7488; font-size:12px; font-weight:600; margin-left:10px"> Manager </span>
 	     </div>
   	</div>
@@ -168,6 +168,13 @@
 		  				<b>Facet nesting:</b>
 		  			</div>
 		  			<div class="large-8 columns" id = "active_nesting">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
+		  				<b>Aggregate facets:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_aggregates">
 		  			</div>
 		  		</div>
 		  		<div class="row" style="margin-top:20px;">
@@ -334,6 +341,15 @@
 		  			<div class="large-8 columns" style="font-size: 12px;">
 		  				<input type="radio" name="predicates_order" value="true" id="alphabetical" style="margin-right:10px;" > alphabetical
 		  				<input type="radio" name="predicates_order" value="false" id="browsing_voted" style="margin-right:10px;margin-left:10px;">browsing-voted
+					</div>
+				</div>
+				<div class="row" style="margin-top:20px;">
+					<div class="large-4 columns">
+		  				<b>Aggregate facets:</b>
+		  			</div>
+		  			<div class="large-8 columns" style="font-size: 12px;">
+		  				<input type="radio" name="aggregates" value="true" id="enabled_aggregates" style="margin-right:10px;" > enabled
+		  				<input type="radio" name="aggregates" value="false" id="disabled_aggregates" style="margin-right:10px;margin-left:10px;">disabled
 		  			</div>
 		  		</div>
 		  		<div class="row" style="margin-top:20px;">
@@ -450,7 +466,7 @@
       	</div>
   	</div>
 
-  
+
   <!-- End Header and Nav -->
 
   <script>
@@ -458,9 +474,9 @@
   ('__proto__' in {} ? 'Client/js/vendor/zepto' : 'Client/js/vendor/jquery') +
   '.js><\/script>')
   </script>
-  
+
   <script src="Client/js/foundation.min.js"></script>
-   
+
   <script>
     $(document).foundation();
 
@@ -479,7 +495,7 @@
 		$("#load_data_success").hide();
     	$("#load_data_error").hide();
     	$("#update_setting_success").hide();
-    	$("#update_setting_error").hide();    	
+    	$("#update_setting_error").hide();
 	}
 
 	toggleMenu = function(element) {
@@ -488,7 +504,7 @@
 		id = $(element).parent().attr("id");
 		navigateMenu(id, false );
 	}
-	
+
 	navigateMenu = function(id){
 		$(CURRENT_PAGE).removeClass("show-page");
 		$(CURRENT_PAGE).addClass("hide-page");
@@ -497,10 +513,10 @@
 		CURRENT_PAGE="#page_"+id;
 		hideInfoBoxes();
 		switch (id){
-	  		case "statistics_tab": 
+	  		case "statistics_tab":
 	  			getConfigurations();
 	            break;
-	  		case "active_settings_tab": 
+	  		case "active_settings_tab":
 	  			getConfigurations();
 	            break;
 	  		case "update_settings_tab":
@@ -512,13 +528,13 @@
 	        	break;
 	  		default:  break;
 		}
-		
+
 	}
 
     getConfigurations = function () {
       cleanDropBoxes();
       $.getJSON(SERVER_URL+"getConfigurations", { }, function(data) {
-          try {            
+          try {
             $("#statistics_triples").html(data.allTriples);
             $("#statistics_facets").html(data.allPredicates.length);
             $("#statistics_memory").html(data.memory);
@@ -526,14 +542,14 @@
           	$("#active_max_results").html(data.maxSearchResuls);
 	        $("#active_image").html(data.snippetImagePredicate);
 	        $("#active_url").html(data.snippetURLPredicate);
-	        $("#active_title").html(data.snippetTitlePredicate);   
-	        $("#active_description").html(data.snippetDescriptionPredicate);  
+	        $("#active_title").html(data.snippetTitlePredicate);
+	        $("#active_description").html(data.snippetDescriptionPredicate);
 	        $("#active_extra1").html(data.snippetExtra1Predicate);
 	        $("#active_extra2").html(data.snippetExtra2Predicate);
-	        $("#active_extra3").html(data.snippetExtra3Predicate);   
+	        $("#active_extra3").html(data.snippetExtra3Predicate);
           	$("#active_category").html(data.categoryPredicate);
           	$("#active_label").html(data.labelPredicate);
-          	$("#active_hierarchy").html(data.hierarchyPredicate); 
+          	$("#active_hierarchy").html(data.hierarchyPredicate);
           	if (data.nesting) {
           		$("#active_nesting").html("enabled");
           		$("#enabled_nesting").prop("checked", true);
@@ -549,6 +565,14 @@
           		$("#browsing_voted").prop("checked", true);
           	}
           	
+          	if (data.aggregates) {
+          		$("#active_aggregates").html("enabled");
+          		$("#enabled_aggregates").prop("checked", true);
+          	}
+          	else {
+          		$("#active_aggregates").html("disabled");
+          		$("#disabled_aggregates").prop("checked", true);
+          	}
           	$("#active_conjunctive_facets").html(data.conjunctivePredicates.join(", "));
           	$("#active_excluded_predicates").html(data.excludedPredicates.join(", "));
           	$("#active_longitude").html(data.longitudePredicate);
@@ -581,9 +605,9 @@
           	populateDropBox("#settings_excluded_predicates", data.allPredicates, data.excludedPredicates);
 
           } catch (err) {
-          	
+
           }
-      });  
+      });
     }
 
     cleanDropBoxes = function () {
@@ -604,6 +628,7 @@
     }
 
     populateDropBox = function (id, result, selected) {
+    	result.sort();
     	var options = $(id);
 		for (var i = 0; i < result.length; i++)
 			options.append($("<option />").val(result[i]).text(result[i]));
@@ -623,7 +648,7 @@
     setConfigurations = function () {
       hideInfoBoxes();
       validateSettings();
-      $.getJSON(SERVER_URL+"setConfigurations", 
+      $.getJSON(SERVER_URL+"setConfigurations",
       	{max: $("#settings_max_results").val(),
       	 image: $("#settings_image").val(),
       	 url: $("#settings_url").val(),
@@ -640,7 +665,8 @@
       	 conjunctive_predicates: $("#settings_conjunctive_facets").val().join(","),
       	 excluded_predicates: $("#settings_excluded_predicates").val().join(","),
       	 predicates_browsing_order: $("#browsing_voted").is(":checked"),
-      	 nesting: $("#enabled_nesting").is(":checked")}, function(data) {
+      	 nesting: $("#enabled_nesting").is(":checked"),
+      	 aggregates: $("#enabled_aggregates").is(":checked")}, function(data) {
       	 	if (data.success!=null) {
 	        	$("#update_setting_success").show();
 	        	$("#update_setting_success_info").text(data.success);
@@ -649,13 +675,13 @@
 	        	$("#update_setting_error_info").text(data.error);
 	        }
       		getConfigurations();
-      });  
+      });
     }
 
 	uploadData = function(){
 		hideInfoBoxes();
 		$("#file_upload_button").attr("disabled", "disabled");
-		var data = new FormData();    
+		var data = new FormData();
 		var dataFileLoaded = false;
 		var ontologyFileLoaded = false;
 
@@ -673,13 +699,13 @@
 			data.append("data_file", "");
 		if (!ontologyFileLoaded)
 			data.append("ontology_file", "");
-		
+
 		var selectedVal = "";
 		var selected = $("input[type='radio'][name='storeType']:checked");
 		if (selected.length > 0) {
     		selectedVal = selected.val();
 		}
-		
+
 		data.append("store_type", selectedVal);
 
 	    $.ajax({
@@ -687,7 +713,7 @@
 	        type: 'POST',
 	        xhr: function() {
 	            var myXhr = $.ajaxSettings.xhr();
-	            if(myXhr.upload){ 
+	            if(myXhr.upload){
 	            	$("#upload_file_progress").show();
 	                myXhr.upload.addEventListener('progress',progressHandlingFunction, false);
 	            }
@@ -735,7 +761,7 @@
 
 	getDataPreview = function () {
       $.getJSON(SERVER_URL+"getDataPreview", { }, function(data) {
-          try {          
+          try {
           	$("#preloader").hide();
           	$('#data_preview tbody > tr').remove();
           	var triple = "";
@@ -746,7 +772,7 @@
           } catch (err) {
           	alert(err);
           }
-      });  
+      });
     }
 
     encodeTriple = function (str) {

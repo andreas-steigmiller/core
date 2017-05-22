@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -44,6 +46,7 @@ import com.google.gson.GsonBuilder;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 
+import semfacet.data.enums.StoresEnum;
 import semfacet.data.init.DataContextListener;
 import semfacet.external.operations.ExternalUtils;
 import semfacet.external.operations.MemoryCheck;
@@ -422,12 +425,13 @@ public class FeedService {
     @GET
     @Path("/setConfigurations")
     @Produces("application/json")
+    
     public String setConfigurations(@QueryParam("max") int max, @QueryParam("image") String image, @QueryParam("url") String url,
             @QueryParam("title") String title, @QueryParam("description") String description, @QueryParam("extra1") String extra1,
             @QueryParam("extra2") String extra2, @QueryParam("extra3") String extra3, @QueryParam("category") String category,
             @QueryParam("label") String label, @QueryParam("latitude") String latitude, @QueryParam("longitude") String longitude,
             @QueryParam("hierarchy") String hierarchy, @QueryParam("conjunctive_predicates") String conFacets,
-            @QueryParam("excluded_predicates") String exclPredicates, @QueryParam("predicates_browsing_order") boolean browsing_order, @QueryParam("nesting") boolean nesting) {
+            @QueryParam("excluded_predicates") String exclPredicates, @QueryParam("nesting") boolean nesting, @QueryParam("aggregates") boolean aggregates, @QueryParam("predicates_browsing_order") boolean browsing_order) {
         LOG.info("Activating new settings");
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
 
@@ -439,6 +443,7 @@ public class FeedService {
         config.setNesting(nesting);
         config.setBrowsingOrder(browsing_order);
 
+
         String snippetDescription = config.getSnippetDescriptionPredicate();
         String snippetTitle = config.getSnippetTitlePredicate();
         String snippetExtra1 = config.getSnippetExtra1Predicate();
@@ -453,6 +458,25 @@ public class FeedService {
             config.setSnippetExtra3Predicate(extra3);
             config.setSearchIndex(DataContextListener.loadDataToSearchIndex(config));
         }
+        
+        String[] excluded = exclPredicates.split(",");
+        Set<String> excludedPredicates = new HashSet<String>();
+        for (String predicate : excluded)
+            excludedPredicates.add(predicate);
+
+        config.setExcludedPredicates(excludedPredicates);
+        DataContextListener.setDefaultExcludedPredicates(excludedPredicates, config);
+        
+        Set<String> currentexcludedPredicates = config.getExcludedPredicates();
+        Set<String> excludedPredicatesAgg = new HashSet<String>();
+        for (String predicate : currentexcludedPredicates) {
+            excludedPredicatesAgg.add(predicate + "_count");
+        	excludedPredicatesAgg.add(predicate + "_min");
+        	excludedPredicatesAgg.add(predicate + "_sum");
+        	excludedPredicatesAgg.add(predicate + "_max");
+        	excludedPredicatesAgg.add(predicate + "_avg");
+        }
+        config.setExcludedAggregatePredicates(excludedPredicatesAgg);
 
         String categoryPredicate = config.getCategoryPredicate();
         if (!categoryPredicate.equals(category)) {
@@ -480,14 +504,41 @@ public class FeedService {
         for (String predicate : conjunctive)
             conjunctivePredicates.add(predicate);
         config.setConjunctivePredicates(conjunctivePredicates);
-
-        String[] excluded = exclPredicates.split(",");
-        Set<String> excludedPredicates = new HashSet<String>();
-        for (String predicate : excluded)
-            excludedPredicates.add(predicate);
-
-        config.setExcludedPredicates(excludedPredicates);
-        DataContextListener.setDefaultExcludedPredicates(excludedPredicates, config);
+        
+        Store store = config.getTripleStore();
+        boolean oldaggregates = config.isAggregate();
+        if (aggregates && !oldaggregates && StoresEnum.valueOf(config.getStoreType()) == StoresEnum.JRDFOX){
+        	config.setAggregates(aggregates);
+        	Set<String> predicates = QueryExecutor.getAllPredicates(config);
+        	store.loadAggregateFacts(predicates);
+            Set<String> allpredicates = QueryExecutor.getAllPredicates(config);
+            Map<String, FacetName> facetTypeMap = new HashMap<String, FacetName>();
+            for (String predicate : allpredicates)
+                //facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataType(predicate, config));
+            	facetTypeMap.put(predicate, QueryExecutor.createPredicateWithDataTypeA(predicate, config));
+            config.setFacetTypeMap(facetTypeMap);
+            //LOG.info("Predicate types were set.");
+            LOG.info("Number of triples after materializing aggregate information: " + store.getItemsCount());
+        } else if (!aggregates && oldaggregates && StoresEnum.valueOf(config.getStoreType()) == StoresEnum.JRDFOX) {
+        	config.getTripleStore().dispose();
+        	try {
+        		Store newstore = DataContextListener.getStore(config);
+            	newstore.loadOntology(config.getOntologyPath());
+            	newstore.loadData(config.getDataPath());
+            	config.setTripleStore(newstore);
+            	config.setAggregates(aggregates);
+            	LOG.info("Aggregate triples have been removed. Number of triples:" + newstore.getItemsCount());
+            } catch (StoreException e) {
+                LOG.error("Failed to load file" + e.getMessage());
+            }
+        } else if (aggregates && !oldaggregates && StoresEnum.valueOf(config.getStoreType()) != StoresEnum.JRDFOX) {
+            LOG.error(StoresEnum.valueOf("Aggregation with" + config.getStoreType()).toString() + " is currently not supported. Only with JRDFox.");
+            JsonMessage message = new JsonMessage();
+            message.setError(StoresEnum.valueOf("Aggregation with" + config.getStoreType()).toString() + " is currently not supported. Only with JRDFox.");
+            Gson gson = new Gson();
+            return gson.toJson(message);
+        }
+        
 
         context.setAttribute(DataContextListener.CONFIGURATIONS, config);
         JsonMessage message = new JsonMessage();
@@ -496,83 +547,6 @@ public class FeedService {
         return gson.toJson(message);
     }
     
-    /* Old version
-    @GET
-    @Path("/setConfigurations")
-    @Produces("application/json")
-    public String setConfigurations(@QueryParam("max") int max, @QueryParam("image") String image, @QueryParam("url") String url,
-            @QueryParam("title") String title, @QueryParam("description") String description, @QueryParam("extra1") String extra1,
-            @QueryParam("extra2") String extra2, @QueryParam("extra3") String extra3, @QueryParam("category") String category,
-            @QueryParam("label") String label, @QueryParam("latitude") String latitude, @QueryParam("longitude") String longitude,
-            @QueryParam("hierarchy") String hierarchy, @QueryParam("conjunctive_predicates") String conFacets,
-            @QueryParam("excluded_predicates") String exclPredicates, @QueryParam("nesting") boolean nesting) {
-        LOG.info("Activating new settings");
-        Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
-
-        config.setSnippetImagePredicate(image);
-        config.setSnippetURLPredicate(url);
-        config.setLatitudePredicate(latitude);
-        config.setLongitudePredicate(longitude);
-        config.setMaxSearchResuls(max);
-        config.setNesting(nesting);
-
-        String snippetDescription = config.getSnippetDescriptionPredicate();
-        String snippetTitle = config.getSnippetTitlePredicate();
-        String snippetExtra1 = config.getSnippetExtra1Predicate();
-        String snippetExtra2 = config.getSnippetExtra2Predicate();
-        String snippetExtra3 = config.getSnippetExtra3Predicate();
-        if (!snippetDescription.equals(description) || !snippetTitle.equals(title) || !snippetExtra1.equals(extra1) || !snippetExtra2.equals(extra2)
-                || !snippetExtra3.equals(extra3)) {
-            config.setSnippetTitlePredicate(title);
-            config.setSnippetDescriptionPredicate(description);
-            config.setSnippetExtra1Predicate(extra1);
-            config.setSnippetExtra2Predicate(extra2);
-            config.setSnippetExtra3Predicate(extra3);
-            config.setSearchIndex(DataContextListener.loadDataToSearchIndex(config));
-        }
-
-        String categoryPredicate = config.getCategoryPredicate();
-        if (!categoryPredicate.equals(category)) {
-            config.setCategoryPredicate(category);
-            config.setIdCategoryMap(QueryExecutor.mapCategoriesToIds(config));
-            LOG.info("Number of ids that have categories : " + config.getIdCategoryMap().size());
-        }
-
-        String labelPredicate = config.getLabelPredicate();
-        if (!labelPredicate.equals(label)) {
-            config.setLabelPredicate(label);
-            config.setIdLabelMap(QueryExecutor.mapLabelsToIds(config));
-            LOG.info("Number of ids that have labels : " + config.getIdLabelMap().size());
-        }
-
-        String hierarchyPredicate = config.getHierarchyPredicate();
-        if (!hierarchyPredicate.equals(hierarchy)) {
-            config.setHierarchyPredicate(hierarchy);
-            config.setHierarchyMap(QueryExecutor.getHierarchyMap(config));
-            LOG.info("Hierarchy map was created.");
-        }
-
-        String[] conjunctive = conFacets.split(",");
-        Set<String> conjunctivePredicates = new HashSet<String>();
-        for (String predicate : conjunctive)
-            conjunctivePredicates.add(predicate);
-        config.setConjunctivePredicates(conjunctivePredicates);
-
-        String[] excluded = exclPredicates.split(",");
-        Set<String> excludedPredicates = new HashSet<String>();
-        for (String predicate : excluded)
-            excludedPredicates.add(predicate);
-
-        config.setExcludedPredicates(excludedPredicates);
-        DataContextListener.setDefaultExcludedPredicates(excludedPredicates, config);
-
-        context.setAttribute(DataContextListener.CONFIGURATIONS, config);
-        JsonMessage message = new JsonMessage();
-        message.setSuccess("Settings were successfully updated.");
-        Gson gson = new Gson();
-        return gson.toJson(message);
-    }
-    */
 
     /**
      * This method allows user to upload new data and ontology files and set
@@ -632,7 +606,7 @@ public class FeedService {
             store.loadData(dataFile);
             LOG.info("Number of tuples after import: " + store.getItemsCount());
             config.setTripleStore(store);
-
+            config.setAggregates(false);
             DataContextListener.loadInMemoryIndexes(config);
 
         } catch (IOException e) {

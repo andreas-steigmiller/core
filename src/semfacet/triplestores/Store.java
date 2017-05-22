@@ -6,11 +6,17 @@
 package semfacet.triplestores;
 
 import java.io.File;
+import java.util.Set;
+
 
 public interface Store {
     void loadData(File file) throws StoreException;
+    
+    void loadData(String dataPath) throws StoreException;
 
     void loadOntology(String ontologyPath) throws StoreException;
+    
+    public void loadAggregateFacts(Set<String> allpredicates);
 
     ResultSet executeQuery(String query, boolean computeUpperBound);
 
