@@ -1241,6 +1241,8 @@ generateSnippets = function(data) {
         if (image == "")
             display = "none";
         var id = cleanFacetValues(data.snippets[i].id);
+        console.log("ID:  "+ id);
+        
         var result_string = getSnippetDiv(id, url, title, display, image, description, extra1, extra2, extra3);
         $("#results").append(result_string);
     }
@@ -1258,7 +1260,7 @@ generateSnippets = function(data) {
 }
 
 
-getSnippetDiv = function(url, title, display, image, description, extra1, extra2, extra3) {
+getSnippetDiv = function(id, url, title, display, image, description, extra1, extra2, extra3) {
     var keywords = $("#searchText").val();
     return  '<div style="height-min:250px; clear:both;">' +
                 '<a style="font-size:14px" target="_blank" href="' + url + '">' + hiliter(keywords, title) + '</a>' + 

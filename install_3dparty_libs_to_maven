@@ -1,4 +1,4 @@
-mvn install:install-file -Dfile=./lib/RDFox/Linux/JRDFox.jar -DgroupId=uk.ac.ox.cs \
+mvn install:install-file -Dfile=./lib/RDFox/Mac/JRDFox.jar -DgroupId=uk.ac.ox.cs \
     -DartifactId=JRDFox -Dversion=1.0 -Dpackaging=jar
 mvn install:install-file -Dfile=./lib/PAGOdA/pagoda.jar -DgroupId=uk.ac.ox.cs \
     -DartifactId=pagoda -Dversion=1.0 -Dpackaging=jar
