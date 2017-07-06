@@ -4,6 +4,11 @@
 
 package semfacet.data.structures;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 // TODO: pick better names for facet value properties
 public class FacetValue {
     private String id;// id provided by the client side
@@ -15,17 +20,23 @@ public class FacetValue {
     private String label;
     private String type; // see FacetValueEnum
     private boolean isHidden;
-    private int ranking = 0; // ranking can be obtained from external db and
-                             // computed using user clicks, then it can be used
-                             // to order facet values
+    private int ranking = 0; //we adopt count-based ranking
+    private List<String> queryList_reachability;
+    private Set<String> answer_set_on_selection;
 
-    public FacetValue(String object, String type) {
+
+
+	public FacetValue(String object, String type) {
         this.object = object;
         this.type = type;
         if (this.label == null) {
             this.label = createLabel(object);
         }
+        this.queryList_reachability = new ArrayList<String>();
+        this.answer_set_on_selection = new HashSet<String>();
     }
+	
+    public FacetValue() {}
 
     public int getRanking() {
         return ranking;
@@ -34,10 +45,26 @@ public class FacetValue {
     public void setRanking(int ranking) {
         this.ranking = ranking;
     }
+    
+    public List<String> getQuery_reachability() {
+		return queryList_reachability;
+	}
+    
+    public void addQueryReachability(String query){
+		this.queryList_reachability.add(query);
+	}
 
-    public FacetValue() {
+	public void setQuery_reachability(List<String> query_reachability) {
+		this.queryList_reachability = query_reachability;
+	}
+	
+	public Set<String> getAnswer_set_on_selection() {
+		return answer_set_on_selection;
+	}
 
-    }
+	public void answerSetOnSelection(Set<String> answer_set_on_selection) {
+		this.answer_set_on_selection = answer_set_on_selection;
+	}
 
     public boolean isHidden() {
         return isHidden;
@@ -114,6 +141,29 @@ public class FacetValue {
     
     @Override
     public String toString(){
-    	return "object: " + object + " label: " + label + " predicate: " + predicate + " type: " + type + " ranking: " +ranking;
+    	return object +  " type: " + type + " count: " +ranking;
     }
+    
+    @Override
+    public int hashCode() {
+        return this.getObject().hashCode() + this.getLabel().hashCode();
+    }
+
+    
+    @Override
+    public boolean equals(Object o){
+    	if(o == null || !(o instanceof FacetValue))
+    		return false;
+    	FacetValue fv = (FacetValue) o;
+    	if(this.getParent() == null && fv.getParent() == null)
+    		return fv.getObject().equals(this.getObject()) && fv.getLabel().equals(this.getLabel());
+    	else if (this.getParent() == null &&  fv.getParent() != null)
+    		return false;
+    	else if (this.getParent() != null &&  fv.getParent() == null)
+    		return false;
+    	
+    	return fv.getObject().equals(this.getObject()) && fv.getLabel().equals(this.getLabel())
+    			&& this.getParent().equals(fv.getParent());
+    }
+    
 }

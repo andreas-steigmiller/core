@@ -32,6 +32,7 @@ import semfacet.data.structures.Triple;
 import semfacet.model.QueryExecutor;
 import semfacet.ranking.Ranking;
 import semfacet.search.SearchIndex;
+import semfacet.triplestores.ResultSet;
 
 public class QueryManager {
 	static Logger LOG = Logger.getLogger(QueryManager.class.getName());
@@ -44,7 +45,7 @@ public class QueryManager {
         
         List<String> retrievedIds = getIdsFromKeywordSearch(searchKeywords, config);
         List<String> idsForPage = getIdsForPage(0, retrievedIds);
-        List<Snippet> snipets = getSnipets(idsForPage, config);
+        List<Snippet> snipets = getSnippets(idsForPage, config);
 
         String facetId = config.getCategoryPredicate();
         FacetName firstFacetName = new FacetName(facetId, config.getIdLabelMap().get(facetId));
@@ -83,14 +84,13 @@ public class QueryManager {
 
         return uniqueFacetValues;
     }
-
     
-    //TODO: we have to transform the global maps into local maps
-    static Map<String, Integer> map_facetClassValues = new HashMap<String, Integer>();
-    static Map<String, Integer> map_facetObjectValues = new HashMap<String, Integer>();
     
     public static List<FacetValue> getFirstFacetValues(List<String> retrievedIds, Configurations config) {
-    	map_facetClassValues.clear();
+    	
+
+    	Map<String, Integer> map_facetClassValues = new HashMap<String, Integer>();
+        Map<String, Integer> map_facetObjectValues = new HashMap<String, Integer>();
     	
     	//new version
     	for (String subject : retrievedIds){
@@ -104,7 +104,7 @@ public class QueryManager {
     			}
     		}
     	}
-    	List<FacetValue> facetValues = getFacetValueHierarchy(config, map_facetClassValues.keySet(), new HashSet<String>(), true);
+    	List<FacetValue> facetValues = getFacetValueHierarchy(config, map_facetClassValues, map_facetObjectValues, true);
     	Ranking.sortFacetValuesByRank(facetValues);
     	
     	
@@ -131,9 +131,15 @@ public class QueryManager {
     
 
     // This method is a variation of BSF
-    public static List<FacetValue> getFacetValueHierarchy(Configurations config, Set<String> facetClasses, Set<String> facetIndividuals,
+    public static List<FacetValue> getFacetValueHierarchy(Configurations config, Map<String, Integer> map_facetClassValues, Map<String, Integer> map_facetObjectValues,
             boolean invertType) {
         List<FacetValue> result = new ArrayList<FacetValue>();
+        
+        Set<String> facetClasses = map_facetClassValues.keySet();
+        Set<String> facetIndividuals = map_facetObjectValues.keySet();
+        if(facetIndividuals == null)
+        	facetIndividuals = new HashSet<String>();
+        
         if (config.getHierarchyMap().size() == 0) {
             return getNonHierarcicalFacetValues(facetClasses, facetIndividuals, invertType);
         } else {
@@ -231,6 +237,21 @@ public class QueryManager {
     }
 
     
+    
+    
+    
+    
+    // necessary for other baselines
+    public static boolean countBased = false;
+    public static boolean maxBased = false;
+    
+    public static boolean linearCombination = false;
+    public static double alfa = 1.0;
+    public static double beta = 1.0;
+    public static double gamma = 1.0;
+    
+    
+    
     public static Response getInitialFacetNames(List<String> queryList, String searchKeywords, Configurations config) {
     	Response answer = new Response();
         Set<String> retrievedIds = new HashSet<String>(QueryManager.getIdsFromFacets(config, queryList));
@@ -253,11 +274,27 @@ public class QueryManager {
             fn.setSliderDateTimeMinValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMinValue());
                
             //We remove this line for the evaluation without equal-size            
-            if(retrievedIds.size() > 1)
+            if(retrievedIds.size() > 1 && config.isBrowsingOrder())
             	fn.setRanking( fn.getRanking()* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
             
             // in case in which we consider depth=1
             //fn.setRanking( 1* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
+            
+            
+            //For the evaluation with other baselines
+            if(countBased){
+            	//LOG.info("answer set of facet: " + fn.getName() + " --> "+ fn.getAnswerSet());
+            	fn.setRanking(fn.getAnswerSet().size());
+            }
+            
+            else if(linearCombination){
+            	double depth = fn.getRanking();
+            	double sel = 1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size());
+            	
+            	//the problem is that the value of 'overlap' depends on the ordering
+            	double overlap = 0;
+            	fn.setRanking(alfa*sel + gamma*depth);
+            }
         }
         
         if(config.isBrowsingOrder()){
@@ -265,6 +302,17 @@ public class QueryManager {
             List<FacetName> facetNames2 = getDiversifiedPredicates(facetNames, retrievedIds, K_TOP_PREDICATES, THRESHOLD_INTERSECTION);        
             answer.setSize(retrievedIds.size());
             answer.setFacetNames(facetNames2);
+        }
+        else if(linearCombination){
+        	Ranking.sortFacetNamesByRank(facetNames);
+            List<FacetName> facetNames2 = getDiversifiedPredicatesLinearCombination(facetNames, retrievedIds, K_TOP_PREDICATES, THRESHOLD_INTERSECTION, beta);        
+            answer.setSize(retrievedIds.size());
+            answer.setFacetNames(facetNames2);
+        }
+        else if(countBased){
+        	Ranking.sortFacetNamesByRank(facetNames);
+        	answer.setSize(retrievedIds.size());
+            answer.setFacetNames(facetNames);
         }
         else{
         	Ranking.sortFacetNamesAlphabetically(facetNames, true);
@@ -279,13 +327,7 @@ public class QueryManager {
         answer.setSize(retrievedIds.size());
         answer.setFacetNames(facetNames);
         */
-        
-        
-        
-        
-        
-        
-        
+
         /*  This code is for the evaluation of browse-ability strategy
         int k_tops[] = {3,4,5,7,10};
         for(int i=0; i< k_tops.length; i++){   
@@ -337,6 +379,7 @@ public class QueryManager {
     }
     
     
+    
     /**
      * return the set of more diversified facet predicates
      * starting from a sorted list by ranking and a threshold k of the number of top k diversified
@@ -355,7 +398,7 @@ public class QueryManager {
     		
     		if(predicate.getRanking() > 0 && (selected.size() < k_top || uncovered.size() != 0)){
     			
-    			if( Sets.intersection(answerSet, uncovered).size() > ((double)sizeAnswerSet/t_overlapped)){
+    			if(Sets.intersection(answerSet, uncovered).size() > ((double)sizeAnswerSet/t_overlapped)){
     				selected.add(predicate);
     				uncovered.removeAll(answerSet);
     			}
@@ -373,9 +416,185 @@ public class QueryManager {
     
     
     
+    /*This is for the approach of linear combination */
+    public static List<FacetName> getDiversifiedPredicatesLinearCombination(List<FacetName> predicates, Set<String> retrievedIds, 
+    		int k_top, double t_overlapped, double beta){
+    	List<FacetName> selected = new ArrayList<FacetName>();
+    	List<FacetName> temp = new ArrayList<FacetName>();
+    	Set<String> uncovered = new HashSet<String>(retrievedIds);
+    	
+    	
+    	for(FacetName predicate : predicates){
+    		
+    		Set<String> answerSet =predicate.getAnswerSet();
+    		int sizeAnswerSet = answerSet.size();
+    		
+    		if(predicate.getRanking() > 0 && (selected.size() < k_top || uncovered.size() != 0)){
+    			
+    			if(predicate.getRanking() + beta*Sets.intersection(answerSet, uncovered).size() > ((double)sizeAnswerSet/t_overlapped)){
+    				selected.add(predicate);
+    				uncovered.removeAll(answerSet);
+    			}
+    			else{
+    				temp.add(predicate);
+    			}    			
+    		}
+    		else{
+    			temp.add(predicate);
+    		}
+    	}
+    	selected.addAll(temp);
+    	return selected;
+    }
+    
+    
+    public static Response getDataForSelectedValue(FacetValue toggledFacetValue, String searchKeywords, List<String> queryList, Configurations config) {
+        Response answer = new Response();
+        Set<String> retrievedIds = getIdsFromFacets(config, queryList);
+        List<String> keywordSearchIds = getIdsFromKeywordSearch(searchKeywords, config);
+        retrievedIds.retainAll(keywordSearchIds);
+        List<FacetName> relevantFacetNames = new ArrayList<FacetName>();
+        
+        LOG.info("toggledFacetValue: "+ toggledFacetValue);
+        LOG.info("toggledFacetValue type: "+ toggledFacetValue.getType());
+        LOG.info("QUERY LIST: " + queryList);
+
+        //Here the nested facet names
+        if (config.isNesting() && toggledFacetValue.getType().equals(FacetValueEnum.CLASS.toString()))
+            relevantFacetNames = getFacetNamesHybridAlg(toggledFacetValue, queryList, retrievedIds, config);
+        
+        List<String> idsForPage = getIdsForPage(0, new ArrayList<String>(retrievedIds));
+        List<Snippet> snippets = getSnippets(idsForPage, config);
+        answer.setSize(retrievedIds.size());
+        Map<String, FacetName> facetTypeMap = config.getFacetTypeMap();
+        Map<String, String> idLabelMap = config.getIdLabelMap();
+        for (FacetName fn : relevantFacetNames) {
+            if (idLabelMap.containsKey(fn.getName()))
+                fn.setLabel(idLabelMap.get(fn.getName()));
+            fn.setType(facetTypeMap.get(fn.getName()).getType());
+            fn.setMin(facetTypeMap.get(fn.getName()).getMin());
+            fn.setMax(facetTypeMap.get(fn.getName()).getMax());
+            fn.setNumberOfNumerics(facetTypeMap.get(fn.getName()).getNumberOfNumerics());
+            fn.setSliderDateTimeMaxValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMaxValue());
+            fn.setSliderDateTimeMinValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMinValue());
+            
+            
+            if(retrievedIds.size() > 1 && config.isBrowsingOrder())
+            	fn.setRanking( fn.getRanking()* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
+            
+            
+            //For the evaluation with other baselines
+            if(countBased){
+            	LOG.info("answer set of facet: " + fn.getName() + " --> "+ fn.getAnswerSet());
+            	fn.setRanking(fn.getAnswerSet().size());
+            	
+            }            
+        
+        }
+        
+        
+        
+        if(config.isBrowsingOrder()){
+        	Ranking.sortFacetNamesByRank(relevantFacetNames);
+            List<FacetName> facetNames2 = getDiversifiedPredicates(relevantFacetNames, retrievedIds, K_TOP_PREDICATES, THRESHOLD_INTERSECTION);        
+            answer.setSize(retrievedIds.size());
+            answer.setFacetNames(facetNames2);
+        }
+        else{
+        	Ranking.sortFacetNamesAlphabetically(relevantFacetNames, true);
+            answer.setSize(retrievedIds.size());
+            answer.setFacetNames(relevantFacetNames);
+        }
+        
+        
+        
+        
+        answer.setSnippets(snippets);
+        return answer;
+    }
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /*
+     * This method return a List<FacetValue> and for each facet value
+     * the query list as the path to reach that facet value in the graph
+     * 
+     * */
+    
+    static int DEPTH_REACHABILITY = 3;
+    public static List<FacetValue> getReachableFacetValues(String facetName, List<String> queryList, String searchKeywords,
+            Configurations config) {
+        Set<String> retrievedIds = new HashSet<String>(QueryManager.getIdsFromFacets(config, queryList));
+        Set<String> keywordSearchIds = new HashSet<String>(getIdsFromKeywordSearch(searchKeywords, config));
+        retrievedIds = Sets.intersection(retrievedIds, keywordSearchIds);
+        
+        
+        List<FacetValue> facet_values = new ArrayList<FacetValue>();
+        
+        for(String query : queryList){
+            facet_values  = QueryExecutor.getReachableFacetValues(facetName, query, retrievedIds,DEPTH_REACHABILITY,DEPTH_REACHABILITY,facet_values,config);
+        }
+         
+        
+        
+        
+        //for removing the bug in the counters we perform the query and we set the ranking here
+        
+        
+        for(FacetValue fv : facet_values){
+        	Set<String> results = new HashSet<String>();
+        	for(String query : fv.getQuery_reachability()){
+        		String Query = String.format("Select distinct ?x where {%s }", query);
+            	ResultSet tupleIterator = config.getTripleStore().executeQuery(Query, true);
+                if (tupleIterator != null) {
+                    tupleIterator.open();
+                    
+                    //LOG.info("RESULTS FROM THE QUERY ####");
+                    while (tupleIterator.hasNext()) {
+                    	if (retrievedIds.contains(tupleIterator.getItem(0))) {
+                    		results.add(tupleIterator.getItem(0));
+                    	}
+                    	tupleIterator.next();
+                    }
+                    tupleIterator.dispose();  
+                 }
+        	}
+        	fv.answerSetOnSelection(results);
+        	/*
+        	LOG.info("facet value: " + fv + "\nQueryList: " + fv.getQuery_reachability() +
+        			"\nAnswer set: " + fv.getAnswer_set_on_selection());
+        			*/
+        	fv.setRanking(results.size());
+        }
+        
+        
+        List<FacetValue> result = new ArrayList<FacetValue>();
+        result = generateSortedFacetValues(facet_values, config);
+        
+        return result;
+    }
+    
+
+    
+    
+    
+
     
     
 
@@ -385,10 +604,15 @@ public class QueryManager {
         Set<String> keywordSearchIds = new HashSet<String>(getIdsFromKeywordSearch(searchKeywords, config));
         retrievedIds = Sets.intersection(retrievedIds, keywordSearchIds);
         
-        
         List<FacetValue> facetValues = getFacetValuesHybridAlg(toggledFacetName, parentFacetValueId, queryList, retrievedIds, config);
+        List<FacetValue> result = generateSortedFacetValues(facetValues, config);
         
-        //new version
+        return result;
+    }
+    
+    
+    public static List<FacetValue> generateSortedFacetValues(List<FacetValue> values, Configurations config){
+    	//new version
         List<FacetValue> facetObjectValue = new ArrayList<FacetValue>();
         List<FacetValue> facetClassValue = new ArrayList<FacetValue>();
         List<FacetValue> result = new ArrayList<FacetValue>();
@@ -398,7 +622,7 @@ public class QueryManager {
         
         
         Map<String, String> idLabelMap = config.getIdLabelMap();
-        for (FacetValue v : facetValues) {
+        for (FacetValue v : values) {
             if (idLabelMap.containsKey(v.getObject()))
                 v.setLabel(idLabelMap.get(v.getObject()));
             
@@ -423,50 +647,9 @@ public class QueryManager {
         
         return result;
     }
-
-    public static Response getDataForSelectedValue(FacetValue toggledFacetValue, String searchKeywords, List<String> queryList, Configurations config) {
-        Response answer = new Response();
-        Set<String> retrievedIds = getIdsFromFacets(config, queryList);
-        List<String> keywordSearchIds = getIdsFromKeywordSearch(searchKeywords, config);
-        retrievedIds.retainAll(keywordSearchIds);
-        List<FacetName> relevantFacetNames = new ArrayList<FacetName>();
-        
-        
-        //Here the nested facet names
-        if (config.isNesting() && toggledFacetValue.getType().equals(FacetValueEnum.CLASS.toString()))
-            relevantFacetNames = getFacetNamesHybridAlg(toggledFacetValue, queryList, retrievedIds, config);
-        
-        List<String> idsForPage = getIdsForPage(0, new ArrayList<String>(retrievedIds));
-        List<Snippet> snipets = getSnipets(idsForPage, config);
-        answer.setSize(retrievedIds.size());
-        Map<String, FacetName> facetTypeMap = config.getFacetTypeMap();
-        Map<String, String> idLabelMap = config.getIdLabelMap();
-        for (FacetName fn : relevantFacetNames) {
-            if (idLabelMap.containsKey(fn.getName()))
-                fn.setLabel(idLabelMap.get(fn.getName()));
-            fn.setType(facetTypeMap.get(fn.getName()).getType());
-            fn.setMin(facetTypeMap.get(fn.getName()).getMin());
-            fn.setMax(facetTypeMap.get(fn.getName()).getMax());
-            fn.setNumberOfNumerics(facetTypeMap.get(fn.getName()).getNumberOfNumerics());
-            fn.setSliderDateTimeMaxValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMaxValue());
-            fn.setSliderDateTimeMinValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMinValue());
-            if(retrievedIds.size() > 1)
-            	fn.setRanking( fn.getRanking()* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
-        }
-        
-        
-        Ranking.sortFacetNamesByRank(relevantFacetNames);
-        List<FacetName> facetNames2 = getDiversifiedPredicates(relevantFacetNames, retrievedIds, K_TOP_PREDICATES, THRESHOLD_INTERSECTION);
-        answer.setFacetNames(facetNames2);
-        answer.setSnippets(snipets);
-        
-        /* old version
-        Ranking.sortFacetNamesAlphabetically(relevantFacetNames, false);
-        answer.setFacetNames(relevantFacetNames);
-        answer.setSnippets(snipets);
-        */
-        return answer;
-    }
+    
+    
+  
 
     public static Response getDataForUnselectedValue(String searchKeywords, List<String> queryList, Configurations config) {
         Response answer = new Response();
@@ -474,7 +657,7 @@ public class QueryManager {
         List<String> keywordSearchIds = getIdsFromKeywordSearch(searchKeywords, config);
         retrievedIds.retainAll(keywordSearchIds);
         List<String> idsForPage = getIdsForPage(0, retrievedIds);
-        List<Snippet> snipets = getSnipets(idsForPage, config);
+        List<Snippet> snipets = getSnippets(idsForPage, config);
         answer.setSize(retrievedIds.size());
         answer.setSnippets(snipets);
         //LOG.info("querylist: " + queryList.toString());
@@ -500,7 +683,7 @@ public class QueryManager {
             }
         }
         List<String> idsForPage = getIdsForPage(0, retrievedIds);
-        List<Snippet> snipets = getSnipets(idsForPage, config);
+        List<Snippet> snipets = getSnippets(idsForPage, config);
         answer.setSize(retrievedIds.size());
         answer.setSnippets(snipets);
         return answer;
@@ -517,7 +700,7 @@ public class QueryManager {
             retrievedIds = keywordSearchIds;
         }
         List<String> idsForPage = getIdsForPage(activePage, retrievedIds);
-        List<Snippet> snipets = getSnipets(idsForPage, config);
+        List<Snippet> snipets = getSnippets(idsForPage, config);
         answer.setSize(retrievedIds.size());
         answer.setActivePage(activePage);
         answer.setSnippets(snipets);
@@ -534,6 +717,10 @@ public class QueryManager {
         for (FacetName facetName : facetNames)
             facetName.setHidden(true);
                 
+        
+        LOG.info("facet names in dataForHiding: " + facetNames);
+        
+        
         List<FacetName> fNames = new ArrayList<FacetName>();
         for (FacetName facetName : facetNames) {
             for (String query : queryList) {
@@ -552,6 +739,7 @@ public class QueryManager {
         List<FacetValue> conjunctiveValues = new ArrayList<FacetValue>();
         List<FacetValue> fValues = new ArrayList<FacetValue>();
         Set<String> facetsWithTicks = new HashSet<String>();
+        Set<String> facetValuesWithTicks = new HashSet<String>();
         
         List<FacetValue> valuesWithType = new ArrayList<FacetValue>();
         List<FacetValue> disjunctiveValues = new ArrayList<FacetValue>();
@@ -561,12 +749,20 @@ public class QueryManager {
         for (FacetValue val : selectedValues)
             facetsWithTicks.add(val.getPredicate());
         
+        for (FacetValue val : selectedValues)
+        	facetValuesWithTicks.add(val.getObject());
+        
+        LOG.info("target facet values in dataForHiding: " + targetValues);
+        LOG.info("selected facet values in dataForHiding: " + selectedValues);
+    	LOG.info("conjunctive predicates " + config.getConjunctivePredicates());
+    	LOG.info("selected values " + facetValuesWithTicks);
+
         for (FacetValue val : targetValues) {
-        	        	
-            if (config.getConjunctivePredicates().contains(val.getPredicate()) || !facetsWithTicks.contains(val.getPredicate())) {
+            if ((!facetValuesWithTicks.contains(val.getObject()) && config.getConjunctivePredicates().contains(val.getPredicate())) || !facetsWithTicks.contains(val.getPredicate()) ) {
                 val.setHidden(true);
                 conjunctiveValues.add(val);
-            } else {
+            }
+            else {
             	
             	// Consider the facet values with "type" predicate
             	if(val.getPredicate().equals(config.getCategoryPredicate()))
@@ -581,31 +777,7 @@ public class QueryManager {
         
         
         
-        for (FacetValue val : conjunctiveValues) {
-        	/*old version
-            for (String query : queryList) {
-                boolean hide = false;
-                
-                String parent = "x";
-                if (val.getParentId() != null && !val.getParentId().isEmpty())
-                    parent = val.getParentId();
-
-                /* old version
-                if (val.getType().equals(FacetValueEnum.OBJECT.toString())) {
-                    hideQuery = String.format("Select ?x where {%s. ?%s <%s> <%s> . }", query, parent, val.getPredicate(), val.getObject());
-                    hide = QueryExecutor.hideValue(hideQuery, retrievedIds, config);
-
-                } else if (val.getType().equals(FacetValueEnum.CLASS.toString())) {
-                    hideQuery = String.format("Select ?x where {%s . ?%s <%s> ?any . ?any <%s> <%s> . }", query, parent, val.getPredicate(),
-                            config.getCategoryPredicate(), val.getObject());
-                    hide = QueryExecutor.hideValue(hideQuery, retrievedIds, config);
-                }
-                if (!hide) {
-                    val.setHidden(hide);
-                }
-            }
-            */
-            
+        for (FacetValue val : conjunctiveValues) {            
             fValues.add(val);
         }
 
@@ -758,9 +930,7 @@ public class QueryManager {
         return result;
     }
     
-    
-    
-    
+        
     
     
     public static List<String> getIdsFromKeywordSearch(String searchString, Configurations config) {
@@ -814,43 +984,10 @@ public class QueryManager {
         else
             allFacetNames = QueryExecutor.getPredicatesFromStore(queryList, config);
         
-        
-        //int oracle = 10;
-        //if (retrievedIds.size() > oracle) {
-            relevantFacetNames = getFacetNamesMinimizeAlg(toggledFacetValue, queryList, retrievedIds, config, allFacetNames);
-        //} else {
-            //relevantFacetNames = getFacetNamesExaustiveAlg(toggledFacetValue, queryList, config, initialIds, allFacetNames);
-        //}
-                
-        return relevantFacetNames;
-    }
+        relevantFacetNames = getFacetNamesMinimizeAlg(toggledFacetValue, queryList, retrievedIds, config, allFacetNames);
 
-    
-   /* old version
-    public static List<FacetName> getFacetNamesMinimizeAlg(FacetValue toggledFacetValue, List<String> queryList, Set<String> retrievedIds,
-            Configurations config, Set<String> allFacetNames) {
-        List<FacetName> relevantFacetNames = new ArrayList<FacetName>();
-                
-        for (String name : allFacetNames) {
-            boolean hide = true;
-            for (String query : queryList) {
-                if (toggledFacetValue != null) {
-                    if (!query.contains(toggledFacetValue.getId()))
-                        break;
-                    hide = QueryExecutor.hideValue(String.format("Select ?x where {%s. ?%s <%s> ?z . }", query, toggledFacetValue.getId(), name),
-                            retrievedIds, config);
-                } else
-                    hide = QueryExecutor.hideValue(String.format("Select ?x where {%s . ?x <%s> ?z }", query, name), retrievedIds, config);
-                if (!hide) {
-                    relevantFacetNames.add(new FacetName(name));
-                    break;
-                }
-            }
-        }
         return relevantFacetNames;
     }
-    */
-    
     
     
     
@@ -936,8 +1073,8 @@ public class QueryManager {
             Set<String> retrievedIds, Configurations config) {
         List<FacetValue> facetValues = new ArrayList<FacetValue>();
         
-        map_facetClassValues.clear();
-        map_facetObjectValues.clear();
+        Map<String, Integer> map_facetClassValues = new HashMap<String, Integer>();
+        Map<String, Integer> map_facetObjectValues = new HashMap<String, Integer>();
         
         for (String subject : retrievedIds) {
         	
@@ -963,27 +1100,8 @@ public class QueryManager {
         	
         }
         
-        facetValues.addAll(getFacetValueHierarchy(config, map_facetClassValues.keySet(), map_facetObjectValues.keySet(), false));
-        
-        
-        /*
-         * Old version
-         * 
-        Set<String> facetValuesObjects = new HashSet<String>();
-        Set<String> facetValuesClasses = new HashSet<String>();
-
-        // Multiset would give counts
-        for (String subject : retrievedIds) {
-            facetValuesObjects.addAll(QueryExecutor.getFacetObjectValues(queryList, subject, toggledFacetName, parentFacetValueId, config));
-            facetValuesClasses.addAll(QueryExecutor.getFacetClassValues(queryList, subject, toggledFacetName, parentFacetValueId, config));
-        }
-        */
-
-        /*
-         * for (String value : facetValuesObjects) facetValues.add(new
-         * FacetValue(value, FacetValueEnum.OBJECT.toString()));
-         */
-        //facetValues.addAll(getFacetValueHierarchy(config, facetValuesClasses, facetValuesObjects, false));        
+        facetValues.addAll(getFacetValueHierarchy(config, map_facetClassValues, map_facetObjectValues, false));
+                
         return facetValues;
     }
 
@@ -1003,7 +1121,7 @@ public class QueryManager {
         return facetValues;
     }
     
-    
+    /*
     public static List<FacetValue> getFacetValuesMinimizeAlg(String toggledFacetName, List<String> queryList, Set<String> retrievedIds,
             Configurations config) {
     	LOG.info("querylist: " + queryList.get(0));
@@ -1047,6 +1165,7 @@ public class QueryManager {
         facetValues.addAll(getFacetValueHierarchy(config, facetClasses, facetObjects, false));
         return facetValues;
     }
+    */
     
 
     private static Set<String> getFocusIdsSpecialCases(Set<FacetValue> classes, String searchKeywords, List<String> queryList, Configurations config) {
@@ -1086,7 +1205,7 @@ public class QueryManager {
         return result;
     }
 
-    private static List<Snippet> getSnipets(List<String> idsForPage, Configurations config) {
+    private static List<Snippet> getSnippets(List<String> idsForPage, Configurations config) {
         List<Snippet> snippets = new ArrayList<Snippet>();
         for (String subject : idsForPage) {
             Snippet snippet = new Snippet();

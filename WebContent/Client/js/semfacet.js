@@ -55,7 +55,7 @@ runSearch = function(e) {
 /**** BEGIN: METHODS TO GENERATE NAVIGATION MAP***/
 
 // this method generates and updates the navigation map
-updateNavigationMap = function() {
+updateNavigationMap = function() {	
     $("#navigation_map").html("");
     var checked_objects = getSelectedFacetValueIds();
     if (checked_objects.length > 0) {
@@ -67,8 +67,14 @@ updateNavigationMap = function() {
             var value_name = selected_value.attr("object");
             var value_type = selected_value.attr("value_type");
 
-            var value_label = selected_value.parent().text().replace(/\(([0-9]+\))/i,"");
-            //old: var value_label = selected_value.parent().text();
+            var value_label = selected_value.parent().clone()    //clone the element
+            .children() //select all the children
+            .remove()   //remove all the children
+            .end()  //again go back to selected element
+            .text()
+            .replace(/\(([0-9]+\))/i,"");
+
+            console.log('label navigation map: ' + value_label);
 
             var predicate_name = selected_value.attr("predicate");
             var level = value_id.split("_").length;
@@ -126,6 +132,7 @@ makeJsonFromSelectedValues = function(values) {
             "parent_id": getParentId(values[i])
         });
     }
+    
     return selectedValues;
 }
 
@@ -171,10 +178,33 @@ getSameLevelFacetValueIds = function(selected_value) {
         if ($(this).attr('id').match(regex) && $(this).hasClass('facet_checkbox')) {
             ids.push(this.id);
         }
+        if ($(this).attr('id').match(regex) && $(this).hasClass('facet_checkbox_reach')) {
+            ids.push(this.id);
+        }
     });
     return ids;
 }
 
+
+
+//new code
+getSelectedFacetValueIds = function() {
+    var ids = [];
+    $('input:checked').each(function() {
+        if ($(this).hasClass("facet_checkbox") && $(this).is(":visible")) {
+            ids.push(this.id);
+        }
+        if ($(this).hasClass("facet_checkbox_reachable")) {
+            ids.push(this.id);
+        }
+    });
+        
+    return ids;
+}
+
+
+
+/*
 getSelectedFacetValueIds = function() {
     var ids = [];
     $('input:checked').each(function() {
@@ -182,8 +212,9 @@ getSelectedFacetValueIds = function() {
             ids.push(this.id);
         }
     });
+        
     return ids;
-}
+}*/
 
 isSibling = function(id1, id2) {
     var lastIndex1 = id1.lastIndexOf("_");
@@ -630,6 +661,9 @@ filterText = function(el) {
     });
 }
 
+
+
+
 populateFacetValues = function(facetValues, facet_values_element, facet_name, facet_id) {
     var parent_name = '';
     var last_value_id = '';
@@ -645,12 +679,104 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
             value_label = value_label.toUpperCase();
 
         var value_ranking = facetValues[i].ranking;
-
+        var value_queryList =facetValues[i].queryList_reachability;
+        var reachable = false;        
+        if(value_queryList != ''){
+        	reachable = true;
+        }
+        
+        
+        //TODO:Here if we have the queryList, then it means that it is a reachable facet value and we have to set an other method
+        //for the click on it: we have to call 'generateFacetValueCheckbox' with a boolean 'reachable'
         hierarchyMap[value_name] = i;
         if (parent_name != value_parent) {
             parent_name = value_parent;
 
                 if (parent_name == undefined ) {
+                	
+                	if(reachable){
+                        facet_values_element.append("<ol><li>" + generateFacetValueCheckboxReachable('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking, value_queryList) + "</li></ol>");
+                	}
+                	else{
+                        facet_values_element.append("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li></ol>");
+                	}
+                	
+                } else {
+                	if(reachable){
+                        var element = $("#checkbox_" + facet_id + "_" + hierarchyMap[parent_name]).parent();
+                        if (!element.prev().hasClass("collapsed_triangle"))
+                            $('<span onclick="toggle(this)" class="collapsed_triangle"></span>').insertBefore(element);
+                        $("<ol><li>" + generateFacetValueCheckboxReachable('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking, value_queryList) + "</li></ol>").insertAfter(element);
+                        element.next().hide();
+                	}
+                	else{
+                        var element = $("#checkbox_" + facet_id + "_" + hierarchyMap[parent_name]).parent();
+                        if (!element.prev().hasClass("collapsed_triangle"))
+                            $('<span onclick="toggle(this)" class="collapsed_triangle"></span>').insertBefore(element);
+                        $("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li></ol>").insertAfter(element);
+                        element.next().hide();
+                	}
+                }
+        } else {
+        	
+        	if(reachable){
+                var element = $("#" + last_value_id).parent().parent();
+                $("<li>" + generateFacetValueCheckboxReachable('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking, value_queryList) + "</li>").insertAfter(element);
+        	}
+        	else{
+                var element = $("#" + last_value_id).parent().parent();
+                $("<li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li>").insertAfter(element);	
+        	}
+        	
+  
+        }
+        last_value_id = 'checkbox_' + facet_id + '_' + i;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+populateFacetValues = function(facetValues, facet_values_element, facet_name, facet_id) {
+    var parent_name = '';
+    var last_value_id = '';
+    var hierarchyMap = {};
+    for (var i = 0; i < facetValues.length; i++) {
+        var value_name = facetValues[i].object;
+        var value_type = facetValues[i].type;
+        var value_label = facetValues[i].label;
+        var value_parent = facetValues[i].parent;
+        if (value_label == null || value_label == "")
+            value_label = value_name;
+        if (value_type == "1" || facet_id == "0")
+            value_label = value_label.toUpperCase();
+
+        var value_ranking = facetValues[i].ranking;        
+        
+        //TODO:Here if we have the queryList, then it means that it is a reachable facet value and we have to set an other method
+        //for the click on it: we have to call 'generateFacetValueCheckbox' with a boolean 'reachable'
+        hierarchyMap[value_name] = i;
+        if (parent_name != value_parent) {
+            parent_name = value_parent;
+
+                if (parent_name == undefined ) { 	
                     facet_values_element.append("<ol><li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li></ol>");
                 } else {
                     var element = $("#checkbox_" + facet_id + "_" + hierarchyMap[parent_name]).parent();
@@ -669,6 +795,12 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
         last_value_id = 'checkbox_' + facet_id + '_' + i;
     }
 }
+*/
+
+
+
+
+
 
 uncheckChildren = function(id) {
     $("#" + id).parent().next().find("input").prop("checked", false);
@@ -809,6 +941,7 @@ generateFacetNames = function(data) {
         	if (minval == maxval)
         		continue;
         }
+        
         var facet_data = getFacetHeader(i + 1, data.facetNames[i].name, facet_label, data.facetNames[i].type, minval, maxval, minYear, maxYear,numberofnums);
         $("#facets").append(facet_data);
     }
@@ -818,18 +951,30 @@ generateFacetNames = function(data) {
 //new method with ranking
 generateFacetValueCheckbox = function(value_id, value_name, value_label, value_type, value_parent, predicate_name, value_ranking) {
     return  '<label for="' + value_id + '" >' +
-                '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" ranking="' + value_ranking + '" onclick="adjustFacets(this)" class="facet_checkbox">' + cleanFacetValues(value_label) +' ('+ value_ranking +') '+
+                '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" ranking="' + value_ranking + '" onclick="adjustFacets(this)" class="facet_checkbox"/>' + cleanFacetValues(value_label) +' ('+ value_ranking +') '+
             '</label>';
 }
 
-// old method
-/*
-generateFacetValueCheckbox = function(value_id, value_name, value_label, value_type, value_parent, predicate_name) {
-    return  '<label for="' + value_id + '" >' +
-                '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" onclick="adjustFacets(this)" class="facet_checkbox">' + cleanFacetValues(value_label) +
+
+
+//new code
+generateFacetValueCheckboxReachable = function(value_id, value_name, value_label, value_type, value_parent, predicate_name, value_ranking, value_queryList) {
+	//console.log('generate checkbox '+ value_id +'after reachability');
+	return  '<label for="' + value_id + '" >' +
+                '<input id="' + value_id + '" type="checkbox" style="margin-right:10px;margin-bottom:0px;" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" ranking="' + value_ranking + '" queryList="' + value_queryList + '" onclick="adjustFacetsAfterReachability(this)" class="facet_checkbox_reach"/>' + cleanFacetValues(value_label) +' ('+ value_ranking +') '+
             '</label>';
 }
-*/
+
+
+//new code
+generateDummyCheckboxReachable = function(value_id, value_name, value_label, value_type, value_parent, predicate_name, value_ranking) {	
+	return  '<label for="' + value_id + '" >' +
+                '<input id="' + value_id + '" type="checkbox" style="display:none" parent="' + value_parent + '" object="' + value_name + '" predicate="' + predicate_name + '" value_type="' + value_type + '" ranking="' + value_ranking + '" onclick="adjustFacetsAfterReachability(this)" class="facet_checkbox_reachable" checked/>' + cleanFacetValues(value_label) +  
+            '</label>';
+}
+
+
+
 
 
 showHideMoreOptions = function() {
@@ -840,8 +985,196 @@ showHideMoreOptions = function() {
         $("#more_options").css("display", "none");
 }
 
-adjustFacets = function(selected_value) {
+
+//This method allows to integrate reachability feature in SemFacet:
+//As parameters we have the selected element, its associated queryList and a boolean for selection/unselection
+generateDummyCheckboxes = function(selected_value, queryList, selection){
+	
+	//here we parse the queryList and we generate dummy check
+	if(queryList.indexOf("'") !== -1){
+		
+		query = queryList.split(",")[0];
+		var last_id = getParentId($(selected_value).attr("id"));
+			
+			//we split into triples
+			query = query.trim();
+			triples = query.split(" . ");
+			for(var i = 0; i < triples.length; i++){
+				triples[i] = triples[i].trim();
+				subj = triples[i].split(" ")[0].replace("<","").replace(">","").replace("?","");
+				pred = triples[i].split(" ")[1].replace("<","").replace(">","").replace("?","");
+				obj = triples[i].split(" ")[2].replace("<","").replace(">","").replace("?","");				
+				
+				if(triples[i].indexOf("z") !== -1 && pred != $(selected_value).attr("predicate") && obj != $(selected_value).attr("object")){					
+					if(selection){
+						var element = $("#"+ last_id);
+					    $("<ol><li>" + generateDummyCheckboxReachable(last_id+ '_' + 1000+ '_' + i, last_id+ '_' + 1000+ '_' + i, 'wordnet_ANY', 0, undefined, pred, 0) + "</li></ol>").insertAfter(element).hide();
+					    pushCheckboxStack(last_id);
+					}
+					else{
+						var element = $("#"+ last_id+ '_' + 1000+ '_' + i);
+						element.remove();
+					}
+				    last_id = last_id+ '_' + 1000+ '_' + i;   
+
+				}
+				if(i == triples.length-1){
+					var element = $("#"+ last_id);
+					var ranking = $(selected_value).attr("ranking");
+					var predicate = $(selected_value).attr("predicate");
+					var object = $(selected_value).attr("object");
+					var type = $(selected_value).attr("value_type");
+					var parent = $(selected_value).attr("parent");
+					
+					if(selection){
+						console.log("We are creating the dummy checkbox after the parent of the element: " +  "#" + last_id);
+					    $("<ol><li>" + generateDummyCheckboxReachable(last_id+ '_' + 1000+ '_' + i, object, object, type, parent, predicate, ranking) + "</li></ol>").insertAfter(element).hide();
+					    pushCheckboxStack(last_id);
+					}
+					else{
+						var element = $("#"+ last_id+ '_' + 1000+ '_' + i);
+						element.remove();
+					}
+				    last_id = last_id+ '_' + 1000+ '_' + i;
+
+				}	
+			}
+	}
+	else{
+		
+		var last_id = getParentId($(selected_value).attr("id"));
+		
+		//we split into triples
+		queryList = queryList.trim();
+		triples = queryList.split(" . ");
+		for(var i = 0; i < triples.length; i++){
+			triples[i] = triples[i].trim();
+			subj = triples[i].split(" ")[0].replace("<","").replace(">","").replace("?","");
+			pred = triples[i].split(" ")[1].replace("<","").replace(">","").replace("?","");
+			obj = triples[i].split(" ")[2].replace("<","").replace(">","").replace("?","");
+
+			if(triples[i].indexOf("z") !== -1 && pred != $(selected_value).attr("predicate") && obj != $(selected_value).attr("object")){
+				if(selection){
+					var element = $("#"+ last_id);
+				    $("<ol><li>" + generateDummyCheckboxReachable(last_id+ '_' + 1000+ '_' + i, last_id+ '_' + 1000+ '_' + i, 'wordnet_ANY', 0, undefined, pred, 0) + "</li></ol>").insertAfter(element).hide();
+				    pushCheckboxStack(last_id);
+				}
+				else{
+					var element = $("#"+ last_id+ '_' + 1000+ '_' + i);
+					//console.log('pop from he stack until ' + last_id+ '_' + 1000+ '_' + i);
+					//popCheckboxStack(last_id+ '_' + 1000+ '_' + i);
+					element.remove();
+				}
+				last_id = last_id+ '_' + 1000+ '_' + i;   
+			}
+			
+			
+			if(i == triples.length-1){
+				var element = $("#"+ last_id);
+				var ranking = $(selected_value).attr("ranking");
+				var predicate = $(selected_value).attr("predicate");
+				var object = $(selected_value).attr("object");
+				var type = $(selected_value).attr("value_type");
+				var parent = $(selected_value).attr("parent");
+				
+
+				if(selection){
+					console.log("We are creating the dummy checkbox after the parent of the element: " +  "#" + last_id);
+				    $("<ol><li>" + generateDummyCheckboxReachable(last_id+ '_' + 1000+ '_' + i, object, object, type, parent, predicate, ranking) + "</li></ol>").insertAfter(element).hide();
+				    pushCheckboxStack(last_id);
+				}
+				else{
+					var element = $("#"+ last_id+ '_' + 1000+ '_' + i);
+					console.log('remove element ' + last_id+ '_' + 1000+ '_' + i);
+					//popCheckboxStack(last_id+ '_' + 1000+ '_' + i);
+					element.remove();
+				}
+				last_id = last_id+ '_' + 1000+ '_' + i;
+			}
+			
+		}
+	}
+	
+	return last_id;
+}
+
+
+
+adjustFacetsAfterReachability = function(selected_value) {
     showHideMoreOptions();
+    console.log('checkbox stack: ' + CHECKBOX_STACK);
+    var qList = $(selected_value).attr("queryList");
+    console.log('queryList: ' + qList);
+    if ($(selected_value).attr("checked")) {
+    	
+    	console.log('the facet value ' + $(selected_value).attr('id')+ ' is selected');
+    	
+    	//Here we have to create dummy checkboxes starting from the queryList
+    	last_id = generateDummyCheckboxes(selected_value, qList, true);
+    	
+    	//var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
+    	//var same_level_sibling = getSameLevelFacetValueIds(selected_value);
+        //var same_level_sibling_json = makeJsonFromSelectedValues(same_level_sibling);
+        //var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value);
+    	//console.log('adjustFacet method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
+    	//console.log('adjustFacet method: JSON same_level_sibling: ' + JSON.stringify(same_level_sibling_json));
+    	//console.log('adjustFacet method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
+
+	    pushCheckboxStack($(selected_value).attr('id'));
+	    console.log('pop from he stack until ' +$(selected_value).attr('id'));
+        updateNavigationMap();
+        
+        if (FOCUS) {
+            executeFocusQuery();
+        } else {
+            executeHideUnhideFacetValues(selected_value);
+            executeSelectedFacetValueQueryReachability(last_id);
+        }
+        
+        $(selected_value).prop("checked",true);
+    
+    } else {
+    	
+    	console.log('the facet value ' + $(selected_value).attr('id')+ ' is unselected');
+    	
+    	
+    	last_id = generateDummyCheckboxes(selected_value, qList, false);
+    	
+    	
+        popCheckboxStack($(selected_value).attr("id"));
+        
+        console.log('checkbox stack: ' + CHECKBOX_STACK);
+        
+        if ($(selected_value).parent().next().hasClass("facet_div")) {
+            cleanExpandedFacets(selected_value);
+        }
+        $('#'+last_id).remove();
+        updateNavigationMap();
+        
+        
+    	var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
+    	var same_level_sibling = getSameLevelFacetValueIds(selected_value);
+        var same_level_sibling_json = makeJsonFromSelectedValues(same_level_sibling);
+        var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value);
+    	//console.log('adjustFacet method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
+    	//console.log('adjustFacet method: JSON same_level_sibling: ' + JSON.stringify(same_level_sibling_json));
+    	//console.log('adjustFacet method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
+        
+        
+        
+        if (FOCUS) {
+            executeFocusQuery();
+        } else {
+            executeHideUnhideFacetValues(selected_value);
+            executeUnselectedFacetValueQuery();
+        }
+        
+    }
+}
+
+
+adjustFacets = function(selected_value) {
+    showHideMoreOptions();    
     if ($(selected_value).attr("checked")) {
         pushCheckboxStack($(selected_value).attr("id"));
         updateNavigationMap();
@@ -851,7 +1184,7 @@ adjustFacets = function(selected_value) {
             executeHideUnhideFacetValues(selected_value);
             executeSelectedFacetValueQuery(selected_value);
         }
-    } else {
+    } else {    	
         popCheckboxStack($(selected_value).attr("id"));
         if ($(selected_value).parent().next().hasClass("facet_div")) {
             cleanExpandedFacets(selected_value);
@@ -878,6 +1211,9 @@ pushCheckboxStack = function(id) {
     checkParents(id);
     CHECKBOX_STACK.push(id);
 }
+
+
+
 
 executeHideUnhideFacetValues = function(selected_value) {
     cleanResults();
@@ -968,11 +1304,52 @@ cleanExpandedFacets = function(selected_value) {
     }
 }
 
+
+
+
+
+
+
+executeSelectedFacetValueQueryReachability = function(selected_value_id) {
+    cleanResults();
+    $('#preloader').show();
+    var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
+    
+    if (selected_facet_values_json.length < 1) {
+        getMainCategories();
+    } else {
+        $.getJSON(SERVER_URL + "getSelectedFacetValueData", {
+            selected_facet_values: JSON.stringify(selected_facet_values_json),
+            range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+            datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
+            toggled_facet_value_id: selected_value_id,
+            search_keywords: $("#searchText").val()
+        }, function(data) {
+            try {
+                $('#preloader').hide();
+                if (data.snippets == null || data.snippets.length == 0) {
+                    $("#results").html(getEmptyResultMessage());
+                } else {
+                	console.log('data from selection reachability');
+                	for (var i = 0; i < data.snippets.length; i++) {
+                		console.log(data.snippets[i]);
+                	}
+                    generateSnippets(data);
+                }
+            } catch (err) {
+                cleanPage();
+            }
+        });
+    }
+}
+
+
 executeSelectedFacetValueQuery = function(selected_value) {
     cleanResults();
     $('#preloader').show();
     var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
     var toggled_value_json = makeJsonFromSelectedValues(selected_value);
+     
     if (selected_facet_values_json.length < 1) {
         getMainCategories();
     } else {
@@ -990,7 +1367,6 @@ executeSelectedFacetValueQuery = function(selected_value) {
                 } else {
                     generateSnippets(data);
                     generateNestedFacetNames(data, selected_value);
-
                     //TODO: we have also to update the counters in the facet values of the response
                     // we have to use the Stack CHECKBOX_STACK
                 }
@@ -1004,6 +1380,7 @@ executeSelectedFacetValueQuery = function(selected_value) {
 
 generateNestedFacetNames = function(data, selected_value) {
     var parent_value_id = ($(selected_value).attr("id")).replace("checkbox_", "");
+     
     for (var i = 0; i < data.facetNames.length; i++) {
         var facet_label = data.facetNames[i].label;
         if (facet_label == null || facet_label == "")
@@ -1018,10 +1395,21 @@ generateNestedFacetNames = function(data, selected_value) {
         	var maxval = data.facetNames[i].max;
         	if (minval == maxval)
         		continue;
+        	
         }
+        
         var facet_data = getNestedFacetHeader(parent_value_id + '_' + i, data.facetNames[i].name, facet_label, data.facetNames[i].type, minval, maxval,minYear,maxYear);
         $(facet_data).insertAfter($(selected_value).parent());
+        
+        //This code is to enable reachability
+        if(i == data.facetNames.length-1){
+            //TODO:Here we add the search box for looking for a reachable facet
+            var reachable_facet_data = getReachableFacetHeader(parent_value_id + '_' + (i+1), "", "", "", minval, maxval,minYear,maxYear);
+            $(reachable_facet_data).insertAfter($(selected_value).parent());
+        }
+        
     }
+    
 }
 
 getNestedFacetHeader = function(id, facet_name, facet_label, facet_type, min, max, minYear, maxYear) {
@@ -1042,6 +1430,56 @@ getNestedFacetHeader = function(id, facet_name, facet_label, facet_type, min, ma
                 '<div class="facet_values" style="max-height: 200px; overflow-y: scroll;margin-top:5px;"></div>' +
             '</div>';
 }
+
+getReachableFacetHeader = function(id, facet_name, facet_label, facet_type, min, max, minYear, maxYear) {
+	return  '<div class="facet_div" style ="margin-left:20px;">' +
+    			'<div class="facet_header">' +
+                	'<a style="font-size:12px; margin-right:10px; margin-top:7px; float:left; display: block" onclick="toggleFacetNames(this);" class="unexplored moreLess"> </a>' +
+    				'<input type="text" placeholder="Enter facet" onkeypress="searchReachableFacetValues(this, event);" style="height:20px; width:200px; margin-left:5px; margin-top:5px; margin-bottom:0px; margin-right:0px;" facet_id="' + id + '" facet_name="' + facet_name+ '" facet_type="' + facet_type + '" min="' + min +'" max="' + max + '" minYear="' + minYear +'" maxYear="' + maxYear + '"/>' +
+    			'</div>' +
+            	'<input type="text" class="hide" onkeyup="filterText(this);" />' +
+            	'<div class="facet_values" style="max-height: 200px; overflow-y: scroll;margin-top:5px;"></div>' +
+            '</div>';
+}
+
+searchReachableFacetValues = function(el, e) {
+	if(e.keyCode == 13){
+		var element = $(el);
+	    var searchText = element.val();//.toLowerCase();		
+		
+		   $('#preloader').show();
+		    var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
+		    $.getJSON(SERVER_URL + "getReachableFacetValues", {
+		        selected_facet_values: JSON.stringify(selected_facet_values_json),
+		        range_sliders: JSON.stringify(makeJsonFromRangeSliders()),
+		        datetime_sliders: JSON.stringify(makeJsonFromRangeDateTimeSliders()),
+		        search_keywords: $("#searchText").val(),
+		        toggled_facet_name: searchText,
+		        parent_checkbox_id: 'null' //getParentCheckboxId($(element).attr("facet_id"))
+		    }, function(facetValues) {
+		        try {
+		            $('#preloader').hide();
+		            
+		            var facet_id = $(element).attr("facet_id");
+		            var facet_values_element = $(element).parent().siblings(".facet_values").first();
+		            var facet_name = searchText;
+		            
+		            facet_values_element.empty();
+		            populateFacetValues(facetValues, facet_values_element, facet_name, facet_id);
+		            
+		        } catch (err) {
+		            cleanPage();
+		        }
+		    });
+		
+		
+	}
+}
+
+
+
+
+
 
 toggleFacetNames = function(el) {
 	element = $(el);
@@ -1241,7 +1679,7 @@ generateSnippets = function(data) {
         if (image == "")
             display = "none";
         var id = cleanFacetValues(data.snippets[i].id);
-        console.log("ID:  "+ id);
+        //console.log("ID:  "+ id);
         
         var result_string = getSnippetDiv(id, url, title, display, image, description, extra1, extra2, extra3);
         $("#results").append(result_string);
@@ -1261,7 +1699,7 @@ generateSnippets = function(data) {
 
 
 getSnippetDiv = function(id, url, title, display, image, description, extra1, extra2, extra3) {
-    var keywords = $("#searchText").val();
+	var keywords = $("#searchText").val();
     return  '<div style="height-min:250px; clear:both;">' +
                 '<a style="font-size:14px" target="_blank" href="' + url + '">' + hiliter(keywords, title) + '</a>' +
                 '<div style="float:left; min-height: 150px; display: ' + display + '">' +

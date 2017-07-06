@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import semfacet.controler.QueryManager;
 import semfacet.data.structures.Configurations;
 import semfacet.data.structures.FacetName;
 import semfacet.data.structures.FacetValue;
@@ -95,7 +96,7 @@ public class RelevantFacetName implements Runnable{
             	FacetName fn = new FacetName(name);
             	fn.setAnswerSet(answerSet);
             	
-            	if(config.isBrowsingOrder()){
+            	if(config.isBrowsingOrder() || QueryManager.linearCombination){
                 	fn.setRanking(computeH(fn, fn.getAnswerSet().hashCode(), fn.getAnswerSet().size(), queryList, MAX_DEPTH,0));
             	}
             	

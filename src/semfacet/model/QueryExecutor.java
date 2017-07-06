@@ -24,6 +24,8 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import semfacet.controler.QueryManager;
+import semfacet.data.enums.FacetValueEnum;
 import semfacet.data.enums.PredicateTypeEnum;
 import semfacet.data.structures.Configurations;
 import semfacet.data.structures.FacetName;
@@ -222,6 +224,219 @@ public class QueryExecutor {
         }
         return hide;
     }
+    
+    
+    
+    
+    static Map<String, String> facet_query = new HashMap<String, String>();
+    static Map<String, Set<String>> facet_results = new HashMap<String, Set<String>>();
+
+    /**
+     * New method added to find all the possible facet values of a reachable facet name.
+     * We have to check recursively if 'facetName' is reachable from the current 'queryList'
+     * and in the meanwhile we store the result of the paths for reaching the correspondent facet values
+     * @param queryList: current queryList 
+     * @param retrievedIds: current result set
+     * @param limit: threshold for the nesting
+     * @param count: counter for the recursion
+     * @param config: configuration of the system
+     * @return a boolean that indicates whether the facet name is reachable or not
+     * 
+     * */
+    public static List<FacetValue> getReachableFacetValues(String facetName, String query,
+    		Set<String> retrievedIds, int limit, int count, List<FacetValue> facet_values,Configurations config) {
+    	if(count == 0){
+    		return facet_values;
+    	}
+    	
+    	if(count == limit){
+    		facet_query.clear();
+    		facet_results.clear();
+    	}
+    	
+    	int iteration = limit-count;    	
+			query = query.trim();			
+			String triple = query.split(" . ")[0];			
+			String object = triple.split(" ")[2].trim();
+			
+			String newSubject = "";
+			if(iteration == 0) newSubject = object;
+			else newSubject = "?z";
+			
+			String newPredicate = "?y";
+			String newObject = "?zz";
+			String filters = "";
+			
+			for(int i=0; i<iteration; i++){
+				newSubject += "z";
+				newPredicate += "y";
+				newObject += "z";
+				if(filters.equals(""))
+					filters += newPredicate.substring(0, newPredicate.length()-1) +" !=  <" + config.getCategoryPredicate() + ">";
+				else
+					filters += " && " + newPredicate.substring(0, newPredicate.length()-1) +" !=  <" + config.getCategoryPredicate() + ">";
+			}
+			
+			String newQueryWithVariable = query + " . "+ newSubject + " "+ newPredicate + " " + newObject;
+			String newQuery = query + " . "+ newSubject + " <"+ facetName + "> " + newObject;
+			String newQueryClass = String.format("%s . " +newObject+" <%s> ?t . ", newQuery, config.getCategoryPredicate());
+			String completeObjectQuery = "";
+			String completeClassQuery = "";
+			
+			if(!filters.equals("")){
+				String path = "";
+				for(int j=2; j<newPredicate.length(); j++)
+					path += newPredicate.substring(0, j) + " ";
+				
+				completeObjectQuery = String.format("Select distinct ?x "+newObject+" "+path+" where {%s . FILTER (%s) }", newQuery, filters);
+				completeClassQuery = String.format("Select distinct ?x ?t "+path+" where {%s .  "+newObject+" <%s> ?t . FILTER (%s) }",
+						newQuery,config.getCategoryPredicate(), filters);
+			}
+
+			else{
+				completeObjectQuery = String.format("Select distinct ?x " + newObject+" where {%s }", newQuery);
+				completeClassQuery = String.format("Select distinct ?x ?t where {%s .  "+newObject+" <%s> ?t .}",
+					newQuery,config.getCategoryPredicate(), filters);
+			}				
+				
+			Set<String> facetObjectValues = addReachableFacetValues(newObject, newQuery, completeObjectQuery, FacetValueEnum.OBJECT.toString(), iteration, retrievedIds, config);
+			Set<String> facetClassValues = addReachableFacetValues(newObject, newQueryClass, completeClassQuery, FacetValueEnum.CLASS.toString(), iteration, retrievedIds, config);
+            
+			
+			LOG.info("facet_results: " + facet_results);
+			LOG.info("facet_query: " + facet_query);
+
+			//Here we construct the map for the ranking for both individual and classes
+			Map<String, Integer> map_facetClassValues = new HashMap<String, Integer>();
+	        Map<String, Integer> map_facetObjectValues = new HashMap<String, Integer>();
+			for(String obj : facetObjectValues){
+				map_facetObjectValues.put(obj, facet_results.get(obj).size());
+			}
+			
+			for(String cl : facetClassValues){
+				map_facetClassValues.put(cl, 1);
+			}
+			
+	    	List<FacetValue> facetValues = QueryManager.getFacetValueHierarchy(config, map_facetClassValues, map_facetObjectValues, false);
+	    	for(FacetValue fv : facetValues){
+	    		String parent = fv.getParent();
+	    		if(parent != null){
+	    			if(!facet_results.containsKey(parent)){
+	    				Set<String> results = new HashSet<String>();
+            			results.addAll(facet_results.get(fv.getObject()));
+            			facet_results.put(parent, results);
+	    			}
+	    			else{
+	    				facet_results.get(parent).addAll(facet_results.get(fv.getObject()));
+	    			}
+	    		}
+	    	}
+	    	
+	    	//update of the answer sets for the ranking and queryList for each facet value
+	    	List<FacetValue> nonPresent = new ArrayList<FacetValue>();
+	       	for(FacetValue fv : facetValues){
+	       		boolean already_present = false;
+	       		for(FacetValue facet_value : facet_values){
+	       			
+	       			if(facet_value.getObject().equals(fv.getObject())){
+	       				Set<String> answerSet = facet_value.getAnswer_set_on_selection();
+	       				/*
+	       				LOG.info("update of the answer set. Current answer set for the facet: "
+	       				+ fv.getObject() + " --> " + answerSet);
+	       				
+	       				LOG.info("update of the query list. Current queryList for the facet: "
+	    	       				+ fv.getObject() + " --> " + facet_value.getQuery_reachability());
+	    	       		*/
+	       				
+	       				facet_value.getQuery_reachability().add(facet_query.get(fv.getObject()));
+	       				answerSet.addAll(facet_results.get(fv.getObject()));
+	       				facet_value.answerSetOnSelection(answerSet);
+	       				facet_value.setRanking(answerSet.size());
+		    			already_present = true;
+		    			
+		    			/*LOG.info("new answer set for the facet: "
+			       				+ fv.getObject() + " --> " + facet_value.getAnswer_set_on_selection());
+		    			
+		    			LOG.info("new query list for the facet: "
+			       				+ fv.getObject() + " --> " + facet_value.getQuery_reachability());
+			       		*/
+	       			}
+	       		}
+	       		
+	       		if(!already_present){
+	       			List<String> qList = new ArrayList<String>();
+	    			qList.add(facet_query.get(fv.getObject()));
+	    			fv.setQuery_reachability(qList);
+	       			fv.answerSetOnSelection(facet_results.get(fv.getObject()));
+	    			fv.setRanking(facet_results.get(fv.getObject()).size());
+	    			nonPresent.add(fv);
+	       		}
+	    	}
+	    	
+	    	facet_values.addAll(nonPresent);
+		
+        return getReachableFacetValues(facetName,newQueryWithVariable,retrievedIds,limit, --count, facet_values, config);
+    }
+    
+    
+    private static Set<String> addReachableFacetValues(String newObject, String queryToReplace, String query, String typeFacetValue, 
+    		int iteration, Set<String> retrievedIds, Configurations config){
+    	Set<String> values = new HashSet<String>();
+    	
+    	//LOG.info("query performed for the reachability: " + query);
+    	ResultSet tupleIterator = config.getTripleStore().executeQuery(query, true);
+        if (tupleIterator != null) {
+            tupleIterator.open();
+            
+            while (tupleIterator.hasNext()) {
+            	String qToReplace = queryToReplace;
+            	if (retrievedIds.contains(tupleIterator.getItem(0))) {
+            		String facet = tupleIterator.getItem(1);
+            		
+            		//LOG.info("FACET: " + facet);
+            		//Here we construct the query
+            		String q = "";
+            		String predicateToReplace = "?y";
+            		for(int i=2; i<=iteration+1; i++){
+            			String predicate = tupleIterator.getItem(i);
+            			//LOG.info("predicate " + predicate);
+            			qToReplace = qToReplace.replace(" "+predicateToReplace+" ", " <"+predicate+"> ");
+            			predicateToReplace += "y";
+            		}
+            		if(typeFacetValue.equals(FacetValueEnum.OBJECT.toString()))
+            			q = qToReplace.replace(newObject, "<"+facet+">");
+            		else
+            			q = qToReplace.replace("?t", "<"+facet+">");
+            		
+            		
+            		//We add in the list if and only if it is new or it has the same query in the map
+            		if(!facet_query.containsKey(facet)){
+            			values.add(facet);
+            			facet_query.put(facet, q);
+            			Set<String> results = new HashSet<String>();
+            			results.add(tupleIterator.getItem(0));
+            			facet_results.put(facet, results);
+            		}
+            		else{
+            			if((typeFacetValue.equals(FacetValueEnum.OBJECT.toString()) && facet_query.get(facet).equals(q))){
+                			facet_results.get(facet).add(tupleIterator.getItem(0));
+            			}
+            		}
+            	}
+                tupleIterator.next();
+            }
+            tupleIterator.dispose();
+        }
+        return values;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     /**

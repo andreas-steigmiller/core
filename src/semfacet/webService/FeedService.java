@@ -121,6 +121,11 @@ public class FeedService {
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);        
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         Response result = QueryManager.getInitialFacetNames(queryList, searchKeywords, config);
@@ -161,12 +166,81 @@ public class FeedService {
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         List<FacetValue> result = QueryManager.getFacetValues(facetName, parentFacetValueId, queryList, searchKeywords, config);        
         Gson gson = new Gson();
         return gson.toJson(result);
     }
+    
+    
+    
+    
+    /**
+     * This method returns a set of facet values for a given reachable facetName based on
+     * a set of searchKeywords and selectedValues provided by the client
+     * application.
+     * 
+     * @param selectedValues
+     *            a set of facet values provided by a client application
+     * @param facetName
+     *            a facet name provided by a client application
+     * @param parentFacetValueId
+     *            a parent facet value id provided by a client application
+     * @return Response in Json format, which contains a set of facetValues
+     * @see FacetValue
+     * @see Response
+     */
+    
+    
+    /* TODO: reachability feature*/
+    @GET
+    @Path("/getReachableFacetValues")
+    @Produces("application/json")
+    public String getReachableFacetValues(@QueryParam("search_keywords") String searchKeywords, @QueryParam("selected_facet_values") String selectedValues,
+            @QueryParam("range_sliders") String rangeSliders, @QueryParam("datetime_sliders") String rangedatetimeSliders, @QueryParam("toggled_facet_name") String facetName,
+            @QueryParam("parent_checkbox_id") String parentFacetValueId) {
+        if (parentFacetValueId.equals("null"))
+            parentFacetValueId = null;
+        
+        LOG.info("facet name for reachability: " + facetName);
+        
+        Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
+        List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
+        List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
+        List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
+        String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
+        List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
+        
+        FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
+        FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
+
+        List<FacetValue> result = QueryManager.getReachableFacetValues(facetName, queryList, searchKeywords, config);                
+        Gson gson = new Gson();
+        return gson.toJson(result);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     /**
      * This method returns a set of snippets based on a set of searchKeywords
@@ -203,13 +277,22 @@ public class FeedService {
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
+        
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         FacetValue selectedFacetValue = ClientDataManager.getFacetValueFromId(toggledValueId, values);
         Response result = QueryManager.getDataForSelectedValue(selectedFacetValue, searchKeywords, queryList, config);
         Utils.logUserActivity(searchKeywords, config, selectedFacetValue);
         Gson gson = new Gson();
-        LOG.info("result: " + result);
+        
+        LOG.info("result from selectedValue: " + gson.toJson(result));
+        
+        
         return gson.toJson(result);
     }
 
@@ -237,6 +320,11 @@ public class FeedService {
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         Response result = QueryManager.getDataForUnselectedValue(searchKeywords, queryList, config);
@@ -269,9 +357,13 @@ public class FeedService {
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
-        
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         
@@ -307,9 +399,13 @@ public class FeedService {
         
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
-        
         Response result = QueryManager.getSnippets(Integer.parseInt(activePage), searchKeywords, queryList, config);
         Gson gson = new Gson();
         return gson.toJson(result);
@@ -355,9 +451,19 @@ public class FeedService {
         List<FacetValue> values = ClientDataManager.getSelectedCheckboxes(selectedValues);
         List<FacetName> sliders = ClientDataManager.getSliderValues(rangeSliders);
  
+        
+        
+        LOG.info("toggled value id: " + toggledValueId);
+        LOG.info("target values: " + toggledValueId);        
+        
         List<FacetName> datetimesliders = ClientDataManager.getSliderDateTimeValues(rangedatetimeSliders);
         String facetQuery = FacetQueryConstructionManager.constructQuery(values, config);
         List<String> queryList = ExternalUtils.parseQuery(facetQuery);
+        List<String> newQueryList = new ArrayList<String>();
+        for(String query : queryList){
+        	newQueryList.add(query.replaceAll("<checkbox([_\\d]*)>", "?checkbox$1"));
+        }
+        queryList = newQueryList;
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);        
         List<FacetValue> targetValues = ClientDataManager.getSelectedCheckboxes(valuesToHideUnhide);
@@ -367,7 +473,10 @@ public class FeedService {
         if (values.size() > 0)
             result = QueryManager.getDataForHiding(toggledFacetValue, targetValues, facetNames, values, searchKeywords, queryList, config);
         else
-            result = ClientDataManager.unhideAllValues(targetValues, facetNames);        
+            result = ClientDataManager.unhideAllValues(targetValues, facetNames);    
+        
+        LOG.info("result from hidUnhide: " + gson.toJson(result));
+        
         return gson.toJson(result);
     }
 
