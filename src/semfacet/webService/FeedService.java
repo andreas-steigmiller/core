@@ -290,9 +290,7 @@ public class FeedService {
         Utils.logUserActivity(searchKeywords, config, selectedFacetValue);
         Gson gson = new Gson();
         
-        LOG.info("result from selectedValue: " + gson.toJson(result));
-        
-        
+        //LOG.info("result from selectedValue: " + gson.toJson(result));    
         return gson.toJson(result);
     }
 
@@ -474,9 +472,7 @@ public class FeedService {
             result = QueryManager.getDataForHiding(toggledFacetValue, targetValues, facetNames, values, searchKeywords, queryList, config);
         else
             result = ClientDataManager.unhideAllValues(targetValues, facetNames);    
-        
-        LOG.info("result from hidUnhide: " + gson.toJson(result));
-        
+        //LOG.info("result from hidUnhide: " + gson.toJson(result));
         return gson.toJson(result);
     }
 

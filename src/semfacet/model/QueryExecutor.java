@@ -302,8 +302,7 @@ public class QueryExecutor {
 			Set<String> facetObjectValues = addReachableFacetValues(newObject, newQuery, completeObjectQuery, FacetValueEnum.OBJECT.toString(), iteration, retrievedIds, config);
 			Set<String> facetClassValues = addReachableFacetValues(newObject, newQueryClass, completeClassQuery, FacetValueEnum.CLASS.toString(), iteration, retrievedIds, config);
             
-			
-			LOG.info("facet_results: " + facet_results);
+			//LOG.info("facet_results: " + facet_results);
 			LOG.info("facet_query: " + facet_query);
 
 			//Here we construct the map for the ranking for both individual and classes

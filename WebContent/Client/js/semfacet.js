@@ -73,9 +73,10 @@ updateNavigationMap = function() {
             .end()  //again go back to selected element
             .text()
             .replace(/\(([0-9]+\))/i,"");
-
+            value_label = value_label.toUpperCase();
+            console.log('value type of selected label: ' + value_type);
             console.log('label navigation map: ' + value_label);
-
+            
             var predicate_name = selected_value.attr("predicate");
             var level = value_id.split("_").length;
             navigation_result += generateNavigationMapPredicate(value_id, predicate_name, checked_objects, (level - 3) * 10);
@@ -685,7 +686,6 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
         	reachable = true;
         }
         
-        
         //TODO:Here if we have the queryList, then it means that it is a reachable facet value and we have to set an other method
         //for the click on it: we have to call 'generateFacetValueCheckbox' with a boolean 'reachable'
         hierarchyMap[value_name] = i;
@@ -1076,7 +1076,6 @@ generateDummyCheckboxes = function(selected_value, queryList, selection){
 				var object = $(selected_value).attr("object");
 				var type = $(selected_value).attr("value_type");
 				var parent = $(selected_value).attr("parent");
-				
 
 				if(selection){
 					console.log("We are creating the dummy checkbox after the parent of the element: " +  "#" + last_id);
@@ -1136,11 +1135,7 @@ adjustFacetsAfterReachability = function(selected_value) {
     } else {
     	
     	console.log('the facet value ' + $(selected_value).attr('id')+ ' is unselected');
-    	
-    	
     	last_id = generateDummyCheckboxes(selected_value, qList, false);
-    	
-    	
         popCheckboxStack($(selected_value).attr("id"));
         
         console.log('checkbox stack: ' + CHECKBOX_STACK);
@@ -1150,6 +1145,8 @@ adjustFacetsAfterReachability = function(selected_value) {
         }
         $('#'+last_id).remove();
         updateNavigationMap();
+        console.log('empty text area...');
+        $('#input_reachable_facetName').val('');
         
         
     	var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
@@ -1401,12 +1398,13 @@ generateNestedFacetNames = function(data, selected_value) {
         var facet_data = getNestedFacetHeader(parent_value_id + '_' + i, data.facetNames[i].name, facet_label, data.facetNames[i].type, minval, maxval,minYear,maxYear);
         $(facet_data).insertAfter($(selected_value).parent());
         
-        //This code is to enable reachability
+        //This code is to enable reachability: comment to eliminate it
         if(i == data.facetNames.length-1){
             //TODO:Here we add the search box for looking for a reachable facet
             var reachable_facet_data = getReachableFacetHeader(parent_value_id + '_' + (i+1), "", "", "", minval, maxval,minYear,maxYear);
             $(reachable_facet_data).insertAfter($(selected_value).parent());
         }
+
         
     }
     
@@ -1435,7 +1433,7 @@ getReachableFacetHeader = function(id, facet_name, facet_label, facet_type, min,
 	return  '<div class="facet_div" style ="margin-left:20px;">' +
     			'<div class="facet_header">' +
                 	'<a style="font-size:12px; margin-right:10px; margin-top:7px; float:left; display: block" onclick="toggleFacetNames(this);" class="unexplored moreLess"> </a>' +
-    				'<input type="text" placeholder="Enter facet" onkeypress="searchReachableFacetValues(this, event);" style="height:20px; width:200px; margin-left:5px; margin-top:5px; margin-bottom:0px; margin-right:0px;" facet_id="' + id + '" facet_name="' + facet_name+ '" facet_type="' + facet_type + '" min="' + min +'" max="' + max + '" minYear="' + minYear +'" maxYear="' + maxYear + '"/>' +
+    				'<input id=input_reachable_facetName type="text" placeholder="Enter facet" onkeypress="searchReachableFacetValues(this, event);" style="height:20px; width:200px; margin-left:5px; margin-top:5px; margin-bottom:0px; margin-right:0px;" facet_id="' + id + '" facet_name="' + facet_name+ '" facet_type="' + facet_type + '" min="' + min +'" max="' + max + '" minYear="' + minYear +'" maxYear="' + maxYear + '"/>' +
     			'</div>' +
             	'<input type="text" class="hide" onkeyup="filterText(this);" />' +
             	'<div class="facet_values" style="max-height: 200px; overflow-y: scroll;margin-top:5px;"></div>' +
