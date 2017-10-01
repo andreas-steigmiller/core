@@ -456,7 +456,7 @@ public class QueryManager {
         List<FacetName> relevantFacetNames = new ArrayList<FacetName>();
         
         LOG.info("toggledFacetValue: "+ toggledFacetValue);
-        LOG.info("toggledFacetValue type: "+ toggledFacetValue.getType());
+       // LOG.info("toggledFacetValue type: "+ toggledFacetValue.getType());
         LOG.info("QUERY LIST: " + queryList);
 
         //Here the nested facet names
@@ -717,9 +717,10 @@ public class QueryManager {
         for (FacetName facetName : facetNames)
             facetName.setHidden(true);
                 
-        
-        LOG.info("facet names in dataForHiding: " + facetNames);
-        
+        LOG.info("facet names in dataForHiding:");
+        for(int i=0; i<facetNames.size(); i++){
+        	LOG.info(facetNames.get(i));
+        }
         
         List<FacetName> fNames = new ArrayList<FacetName>();
         for (FacetName facetName : facetNames) {
@@ -728,6 +729,9 @@ public class QueryManager {
                     hideQuery = String.format("Select ?x where {%s . ?x <%s> ?z }", query, facetName.getName());
                 else
                     hideQuery = String.format("Select ?x where {%s. ?%s <%s> ?z }", query, selectedValue.getParentId(), facetName.getName());
+                
+                
+                LOG.info("Query for hiding facet name " + facetName.getName() + ": " + hideQuery);
                 boolean hide = QueryExecutor.hideValue(hideQuery, retrievedIds, config);
                 if (!hide) {
                     facetName.setHidden(hide);
@@ -740,11 +744,9 @@ public class QueryManager {
         List<FacetValue> fValues = new ArrayList<FacetValue>();
         Set<String> facetsWithTicks = new HashSet<String>();
         Set<String> facetValuesWithTicks = new HashSet<String>();
-        
         List<FacetValue> valuesWithType = new ArrayList<FacetValue>();
         List<FacetValue> disjunctiveValues = new ArrayList<FacetValue>();
 
-        
         
         for (FacetValue val : selectedValues)
             facetsWithTicks.add(val.getPredicate());
@@ -752,10 +754,10 @@ public class QueryManager {
         for (FacetValue val : selectedValues)
         	facetValuesWithTicks.add(val.getObject());
         
-        LOG.info("target facet values in dataForHiding: " + targetValues);
+        LOG.info("target (same level) facet values in dataForHiding: " + targetValues);
         LOG.info("selected facet values in dataForHiding: " + selectedValues);
-    	LOG.info("conjunctive predicates " + config.getConjunctivePredicates());
-    	LOG.info("selected values " + facetValuesWithTicks);
+    	//LOG.info("conjunctive predicates " + config.getConjunctivePredicates());
+    	//LOG.info("selected values " + facetValuesWithTicks);
 
         for (FacetValue val : targetValues) {
             if ((!facetValuesWithTicks.contains(val.getObject()) && config.getConjunctivePredicates().contains(val.getPredicate())) || !facetsWithTicks.contains(val.getPredicate()) ) {
@@ -775,13 +777,9 @@ public class QueryManager {
             }
         }
         
-        
-        
-        for (FacetValue val : conjunctiveValues) {            
-            fValues.add(val);
-        }
+        for (FacetValue val : conjunctiveValues)
+        	fValues.add(val);
 
-        
         
         /*
          * Here the multithreading for updating the frequencies of the relevant facet values 
@@ -817,9 +815,9 @@ public class QueryManager {
         int restConjunctiveValues = sizeTypeValues%numberOfThreads;
         
         
-        LOG.info("number of type values: " + sizeTypeValues);
-        LOG.info("number of disjunctive values: " + sizeDisjunctiveValues);
-        LOG.info("number of conjunctive values: " + sizeConjunctiveValues);
+        //LOG.info("number of type values: " + sizeTypeValues);
+        //LOG.info("number of disjunctive values: " + sizeDisjunctiveValues);
+        //LOG.info("number of conjunctive values: " + sizeConjunctiveValues);
         
         //We can consider 'sizeTypeValues' instead of retrievedIds
         if(retrievedIds.size() < oracleSize){

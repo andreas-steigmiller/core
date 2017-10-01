@@ -188,7 +188,7 @@ public class FacetName {
 	
     @Override
     public String toString(){
-    	return "facet name: " + name + " type: " + type + " id: " + id + "ranking: " + ranking;
+    	return "facet name: " + name + " type: " + type + " id: " + id + " ranking: " + ranking;
     }
     
 }

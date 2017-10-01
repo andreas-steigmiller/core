@@ -73,10 +73,7 @@ updateNavigationMap = function() {
             .end()  //again go back to selected element
             .text()
             .replace(/\(([0-9]+\))/i,"");
-            value_label = value_label.toUpperCase();
-            console.log('value type of selected label: ' + value_type);
-            console.log('label navigation map: ' + value_label);
-            
+            value_label = value_label.toUpperCase();            
             var predicate_name = selected_value.attr("predicate");
             var level = value_id.split("_").length;
             navigation_result += generateNavigationMapPredicate(value_id, predicate_name, checked_objects, (level - 3) * 10);
@@ -685,15 +682,11 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
         if(value_queryList != ''){
         	reachable = true;
         }
-        
-        //TODO:Here if we have the queryList, then it means that it is a reachable facet value and we have to set an other method
-        //for the click on it: we have to call 'generateFacetValueCheckbox' with a boolean 'reachable'
         hierarchyMap[value_name] = i;
         if (parent_name != value_parent) {
             parent_name = value_parent;
 
-                if (parent_name == undefined ) {
-                	
+                if (parent_name == undefined) {
                 	if(reachable){
                         facet_values_element.append("<ol><li>" + generateFacetValueCheckboxReachable('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking, value_queryList) + "</li></ol>");
                 	}
@@ -718,7 +711,6 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
                 	}
                 }
         } else {
-        	
         	if(reachable){
                 var element = $("#" + last_value_id).parent().parent();
                 $("<li>" + generateFacetValueCheckboxReachable('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking, value_queryList) + "</li>").insertAfter(element);
@@ -727,8 +719,6 @@ populateFacetValues = function(facetValues, facet_values_element, facet_name, fa
                 var element = $("#" + last_value_id).parent().parent();
                 $("<li>" + generateFacetValueCheckbox('checkbox_' + facet_id + '_' + i, value_name, value_label, value_type, value_parent, facet_name, value_ranking) + "</li>").insertAfter(element);	
         	}
-        	
-  
         }
         last_value_id = 'checkbox_' + facet_id + '_' + i;
     }
@@ -867,20 +857,26 @@ executeGetFacetValuesQuery = function(element) {
 
 /*** END: METHODS TO GET INITIAL CATEGORIES ***/
 
-getSameLevelFacetNamesJson = function(selected_value) {
+getSameLevelFacetNamesJson = function(selected_value, reachable_value) {
     var facetNames = [];
     var selected_id = $(selected_value).attr('id');
     var level = selected_id.split("_").length - 2;
-    $('.moreLess').each(function() {
-        if ($(this).attr("facet_id") != undefined) {
-            if (level == $(this).attr("facet_id").split("_").length && $(selected_value).attr("predicate") != $(this).attr("facet_name")) {
-                facetNames.push({
-                    "id": $(this).attr("facet_id"),
-                    "name": $(this).attr("facet_name")
-                });
+    console.log('Reachable parameter?', reachable_value);
+    console.log('Level in the selection of the facet Names JSON:', level);
+    while(level > 0){
+    	console.log('Level in the selection of the facet Names JSON:', level);
+        $('.moreLess').each(function() {
+            if ($(this).attr("facet_id") != undefined) {
+                if (level == $(this).attr("facet_id").split("_").length && $(selected_value).attr("predicate") != $(this).attr("facet_name")) {
+                    facetNames.push({
+                        "id": $(this).attr("facet_id"),
+                        "name": $(this).attr("facet_name")
+                    });
+                }
             }
-        }
-    });
+        });
+        level = level - 2;
+	}
     return facetNames;
 }
 
@@ -989,13 +985,13 @@ showHideMoreOptions = function() {
 //This method allows to integrate reachability feature in SemFacet:
 //As parameters we have the selected element, its associated queryList and a boolean for selection/unselection
 generateDummyCheckboxes = function(selected_value, queryList, selection){
+	var last_id = getParentId($(selected_value).attr("id"));
 	
 	//here we parse the queryList and we generate dummy check
+	//Case of multiple query
 	if(queryList.indexOf("'") !== -1){
-		
 		query = queryList.split(",")[0];
-		var last_id = getParentId($(selected_value).attr("id"));
-			
+		
 			//we split into triples
 			query = query.trim();
 			triples = query.split(" . ");
@@ -1027,7 +1023,6 @@ generateDummyCheckboxes = function(selected_value, queryList, selection){
 					var parent = $(selected_value).attr("parent");
 					
 					if(selection){
-						console.log("We are creating the dummy checkbox after the parent of the element: " +  "#" + last_id);
 					    $("<ol><li>" + generateDummyCheckboxReachable(last_id+ '_' + 1000+ '_' + i, object, object, type, parent, predicate, ranking) + "</li></ol>").insertAfter(element).hide();
 					    pushCheckboxStack(last_id);
 					}
@@ -1036,14 +1031,11 @@ generateDummyCheckboxes = function(selected_value, queryList, selection){
 						element.remove();
 					}
 				    last_id = last_id+ '_' + 1000+ '_' + i;
-
 				}	
 			}
 	}
-	else{
-		
-		var last_id = getParentId($(selected_value).attr("id"));
-		
+	// Case of just one query
+	else{		
 		//we split into triples
 		queryList = queryList.trim();
 		triples = queryList.split(" . ");
@@ -1067,8 +1059,6 @@ generateDummyCheckboxes = function(selected_value, queryList, selection){
 				}
 				last_id = last_id+ '_' + 1000+ '_' + i;   
 			}
-			
-			
 			if(i == triples.length-1){
 				var element = $("#"+ last_id);
 				var ranking = $(selected_value).attr("ranking");
@@ -1089,8 +1079,7 @@ generateDummyCheckboxes = function(selected_value, queryList, selection){
 					element.remove();
 				}
 				last_id = last_id+ '_' + 1000+ '_' + i;
-			}
-			
+			}	
 		}
 	}
 	
@@ -1111,22 +1100,15 @@ adjustFacetsAfterReachability = function(selected_value) {
     	//Here we have to create dummy checkboxes starting from the queryList
     	last_id = generateDummyCheckboxes(selected_value, qList, true);
     	
-    	//var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
-    	//var same_level_sibling = getSameLevelFacetValueIds(selected_value);
-        //var same_level_sibling_json = makeJsonFromSelectedValues(same_level_sibling);
-        //var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value);
-    	//console.log('adjustFacet method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
-    	//console.log('adjustFacet method: JSON same_level_sibling: ' + JSON.stringify(same_level_sibling_json));
-    	//console.log('adjustFacet method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
-
 	    pushCheckboxStack($(selected_value).attr('id'));
-	    console.log('pop from he stack until ' +$(selected_value).attr('id'));
+	    console.log('last_id: ' + last_id);
+	    console.log('checkbox stack: ' + CHECKBOX_STACK);
         updateNavigationMap();
-        
+        console.log('FOCUS: ' + FOCUS);
         if (FOCUS) {
             executeFocusQuery();
         } else {
-            executeHideUnhideFacetValues(selected_value);
+            executeHideUnhideFacetValues(selected_value, true);
             executeSelectedFacetValueQueryReachability(last_id);
         }
         
@@ -1147,22 +1129,11 @@ adjustFacetsAfterReachability = function(selected_value) {
         updateNavigationMap();
         console.log('empty text area...');
         $('#input_reachable_facetName').val('');
-        
-        
-    	var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
-    	var same_level_sibling = getSameLevelFacetValueIds(selected_value);
-        var same_level_sibling_json = makeJsonFromSelectedValues(same_level_sibling);
-        var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value);
-    	//console.log('adjustFacet method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
-    	//console.log('adjustFacet method: JSON same_level_sibling: ' + JSON.stringify(same_level_sibling_json));
-    	//console.log('adjustFacet method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
-        
-        
-        
+
         if (FOCUS) {
             executeFocusQuery();
         } else {
-            executeHideUnhideFacetValues(selected_value);
+            executeHideUnhideFacetValues(selected_value, true);
             executeUnselectedFacetValueQuery();
         }
         
@@ -1209,17 +1180,20 @@ pushCheckboxStack = function(id) {
     CHECKBOX_STACK.push(id);
 }
 
-
-
-
-executeHideUnhideFacetValues = function(selected_value) {
+executeHideUnhideFacetValues = function(selected_value, reachable_value) {
     cleanResults();
     $('#preloader').show();
     var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
     var toggled_value_json = makeJsonFromSelectedValues(selected_value);
     var same_level_sibling = getSameLevelFacetValueIds(selected_value);
     var same_level_sibling_json = makeJsonFromSelectedValues(same_level_sibling);
-    var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value);
+    console.log('Reachable value in executeHideUnhide?', reachable_value);
+    var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value, reachable_value);
+    
+    console.log('HideUnhide method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
+	//console.log('HideUnhide method: JSON same_level_sibling: ' + JSON.stringify(same_level_sibling_json));
+	console.log('HideUnhide method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
+    
     $.ajax({
         url: SERVER_URL + "hideUnhideFacetValues",
         type: "POST",
@@ -1234,6 +1208,7 @@ executeHideUnhideFacetValues = function(selected_value) {
         },
         contentType: "application/x-www-form-urlencoded",
         success: function(data) {
+        	console.log('Data response from hideUnhide POST: ' + JSON.stringify(data));
             try {
                 for (var i = 0; i < data.facetValues.length; i++)
                 	showHideValue(data.facetValues[i].isHidden, data.facetValues[i].id, data.facetValues[i].ranking);
