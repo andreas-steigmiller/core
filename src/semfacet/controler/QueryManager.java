@@ -725,10 +725,10 @@ public class QueryManager {
         List<FacetName> fNames = new ArrayList<FacetName>();
         for (FacetName facetName : facetNames) {
             for (String query : queryList) {
-                if (!isNested(selectedValue.getId()))
+                //if (!isNested(selectedValue.getId()))
                     hideQuery = String.format("Select ?x where {%s . ?x <%s> ?z }", query, facetName.getName());
-                else
-                    hideQuery = String.format("Select ?x where {%s. ?%s <%s> ?z }", query, selectedValue.getParentId(), facetName.getName());
+                //else
+                  //  hideQuery = String.format("Select ?x where {%s. ?%s <%s> ?z }", query, selectedValue.getParentId(), facetName.getName());
                 
                 
                 LOG.info("Query for hiding facet name " + facetName.getName() + ": " + hideQuery);
