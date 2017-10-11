@@ -622,7 +622,11 @@ public class QueryExecutor {
 		        			datetime_min = datetime;
 		        		numberOfDateTime++;
 		        	} catch (DateTimeParseException e) {
-		        		continue;
+		        		//tupleIterator.next();
+		        		//continue;
+						type = PredicateTypeEnum.UNKNOWN;
+						facetName.setType(type.toString());
+						return facetName;
 		        	}
 				} else if (type.equals(PredicateTypeEnum.FLOAT) || type.equals(PredicateTypeEnum.DOUBLE) || type.equals(PredicateTypeEnum.INTEGER)) {
                     try {
@@ -633,7 +637,11 @@ public class QueryExecutor {
                             min = number;
                         numberOfNumerics++;
                     } catch (NumberFormatException e) {
-                    	continue; 
+                    	type = PredicateTypeEnum.UNKNOWN;
+						facetName.setType(type.toString());
+						return facetName;
+                    	//tupleIterator.next();
+                    	//continue; 
                     }
 				} else {
 					break;
