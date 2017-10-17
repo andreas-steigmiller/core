@@ -230,6 +230,7 @@ public class QueryExecutor {
     
     static Map<String, String> facet_query = new HashMap<String, String>();
     static Map<String, Set<String>> facet_results = new HashMap<String, Set<String>>();
+    static String prefix_ontology = "";
 
     /**
      * New method added to find all the possible facet values of a reachable facet name.
@@ -278,7 +279,7 @@ public class QueryExecutor {
 			}
 			
 			String newQueryWithVariable = query + " . "+ newSubject + " "+ newPredicate + " " + newObject;
-			String newQuery = query + " . "+ newSubject + " <"+ facetName + "> " + newObject;
+			String newQuery = query + " . "+ newSubject + " <"+ prefix_ontology + facetName + "> " + newObject;
 			String newQueryClass = String.format("%s . " +newObject+" <%s> ?t . ", newQuery, config.getCategoryPredicate());
 			String completeObjectQuery = "";
 			String completeClassQuery = "";
@@ -382,7 +383,7 @@ public class QueryExecutor {
     		int iteration, Set<String> retrievedIds, Configurations config){
     	Set<String> values = new HashSet<String>();
     	
-    	//LOG.info("query performed for the reachability: " + query);
+    	LOG.info("query performed for the reachability: " + query);
     	ResultSet tupleIterator = config.getTripleStore().executeQuery(query, true);
         if (tupleIterator != null) {
             tupleIterator.open();

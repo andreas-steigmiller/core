@@ -179,6 +179,13 @@
 		  		</div>
 		  		<div class="row" style="margin-top:20px;">
 		  			<div class="large-4 columns">
+		  				<b>Reachability:</b>
+		  			</div>
+		  			<div class="large-8 columns" id = "active_reachability">
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+		  			<div class="large-4 columns">
 		  				<b>Conjunctive facet predicates:</b>
 		  			</div>
 		  			<div class="large-8 columns" id="active_conjunctive_facets">
@@ -350,6 +357,15 @@
 		  			<div class="large-8 columns" style="font-size: 12px;">
 		  				<input type="radio" name="aggregates" value="true" id="enabled_aggregates" style="margin-right:10px;" > enabled
 		  				<input type="radio" name="aggregates" value="false" id="disabled_aggregates" style="margin-right:10px;margin-left:10px;">disabled
+		  			</div>
+		  		</div>
+		  		<div class="row" style="margin-top:20px;">
+					<div class="large-4 columns">
+		  				<b>Reachability:</b>
+		  			</div>
+		  			<div class="large-8 columns" style="font-size: 12px;">
+		  				<input type="radio" name="reachability" value="true" id="enabled_reachability" style="margin-right:10px;" > enabled
+		  				<input type="radio" name="reachability" value="false" id="disabled_reachability" style="margin-right:10px;margin-left:10px;">disabled
 		  			</div>
 		  		</div>
 		  		<div class="row" style="margin-top:20px;">
@@ -573,6 +589,15 @@
           		$("#active_aggregates").html("disabled");
           		$("#disabled_aggregates").prop("checked", true);
           	}
+          	if (data.reachability_feature) {
+          		$("#active_reachability").html("enabled");
+          		$("#enabled_reachability").prop("checked", true);
+          	}
+          	else {
+          		$("#active_reachability").html("disabled");
+          		$("#disabled_reachability").prop("checked", true);
+          	}
+          		
           	$("#active_conjunctive_facets").html(data.conjunctivePredicates.join(", "));
           	$("#active_excluded_predicates").html(data.excludedPredicates.join(", "));
           	$("#active_longitude").html(data.longitudePredicate);
@@ -666,6 +691,7 @@
       	 excluded_predicates: $("#settings_excluded_predicates").val().join(","),
       	 predicates_browsing_order: $("#browsing_voted").is(":checked"),
       	 nesting: $("#enabled_nesting").is(":checked"),
+      	 reachability_feature: $("#enabled_reachability").is(":checked"),
       	 aggregates: $("#enabled_aggregates").is(":checked")}, function(data) {
       	 	if (data.success!=null) {
 	        	$("#update_setting_success").show();

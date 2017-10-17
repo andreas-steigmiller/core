@@ -12,6 +12,7 @@ public class Response {
     private FacetName firstFacetName;
     private int size;
     private int activePage;
+    private boolean reachability;
 
     public Response() {
         this.activePage = 0;
@@ -44,6 +45,14 @@ public class Response {
 
     public void setSize(int size) {
         this.size = size;
+    }
+    
+    public boolean getReachability() {
+        return reachability;
+    }
+
+    public void setReachability(boolean reachability) {
+        this.reachability = reachability;
     }
 
     public List<FacetName> getFacetNames() {

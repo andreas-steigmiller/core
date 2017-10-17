@@ -290,7 +290,10 @@ public class FeedService {
         Utils.logUserActivity(searchKeywords, config, selectedFacetValue);
         Gson gson = new Gson();
         
+        result.setReachability(config.getReachability());
+        
         //LOG.info("result from selectedValue: " + gson.toJson(result));    
+        LOG.info("set reachability feature to :"+ config.getReachability());
         return gson.toJson(result);
     }
 
@@ -536,7 +539,8 @@ public class FeedService {
             @QueryParam("extra2") String extra2, @QueryParam("extra3") String extra3, @QueryParam("category") String category,
             @QueryParam("label") String label, @QueryParam("latitude") String latitude, @QueryParam("longitude") String longitude,
             @QueryParam("hierarchy") String hierarchy, @QueryParam("conjunctive_predicates") String conFacets,
-            @QueryParam("excluded_predicates") String exclPredicates, @QueryParam("nesting") boolean nesting, @QueryParam("aggregates") boolean aggregates, @QueryParam("predicates_browsing_order") boolean browsing_order) {
+            @QueryParam("excluded_predicates") String exclPredicates, @QueryParam("nesting") boolean nesting, @QueryParam("aggregates") boolean aggregates,
+            @QueryParam("predicates_browsing_order") boolean browsing_order,  @QueryParam("reachability_feature") boolean reachability) {
         LOG.info("Activating new settings");
         Configurations config = (Configurations) context.getAttribute(DataContextListener.CONFIGURATIONS);
 
@@ -547,6 +551,7 @@ public class FeedService {
         config.setMaxSearchResuls(max);
         config.setNesting(nesting);
         config.setBrowsingOrder(browsing_order);
+        config.setReachability(reachability);
 
 
         String snippetDescription = config.getSnippetDescriptionPredicate();

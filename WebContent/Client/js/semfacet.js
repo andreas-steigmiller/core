@@ -856,7 +856,6 @@ executeGetFacetValuesQuery = function(element) {
 }
 
 /*** END: METHODS TO GET INITIAL CATEGORIES ***/
-
 getSameLevelFacetNamesJson = function(selected_value, reachable_value) {
     var facetNames = [];
     var selected_id = $(selected_value).attr('id');
@@ -1187,12 +1186,12 @@ executeHideUnhideFacetValues = function(selected_value, reachable_value) {
     var toggled_value_json = makeJsonFromSelectedValues(selected_value);
     var same_level_sibling = getSameLevelFacetValueIds(selected_value);
     var same_level_sibling_json = makeJsonFromSelectedValues(same_level_sibling);
-    console.log('Reachable value in executeHideUnhide?', reachable_value);
+    //console.log('Reachable value in executeHideUnhide?', reachable_value);
     var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value, reachable_value);
     
-    console.log('HideUnhide method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
+    //console.log('HideUnhide method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
 	//console.log('HideUnhide method: JSON same_level_sibling: ' + JSON.stringify(same_level_sibling_json));
-	console.log('HideUnhide method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
+	//console.log('HideUnhide method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
     
     $.ajax({
         url: SERVER_URL + "hideUnhideFacetValues",
@@ -1208,7 +1207,7 @@ executeHideUnhideFacetValues = function(selected_value, reachable_value) {
         },
         contentType: "application/x-www-form-urlencoded",
         success: function(data) {
-        	console.log('Data response from hideUnhide POST: ' + JSON.stringify(data));
+        	//console.log('Data response from hideUnhide POST: ' + JSON.stringify(data));
             try {
                 for (var i = 0; i < data.facetValues.length; i++)
                 	showHideValue(data.facetValues[i].isHidden, data.facetValues[i].id, data.facetValues[i].ranking);
@@ -1337,6 +1336,7 @@ executeSelectedFacetValueQuery = function(selected_value) {
                 if (data.snippets == null || data.snippets.length == 0) {
                     $("#results").html(getEmptyResultMessage());
                 } else {
+                	console.log(JSON.stringify(data));
                     generateSnippets(data);
                     generateNestedFacetNames(data, selected_value);
                     //TODO: we have also to update the counters in the facet values of the response
@@ -1373,14 +1373,15 @@ generateNestedFacetNames = function(data, selected_value) {
         var facet_data = getNestedFacetHeader(parent_value_id + '_' + i, data.facetNames[i].name, facet_label, data.facetNames[i].type, minval, maxval,minYear,maxYear);
         $(facet_data).insertAfter($(selected_value).parent());
         
-        //This code is to enable reachability: comment to eliminate it
-        if(i == data.facetNames.length-1){
-            //TODO:Here we add the search box for looking for a reachable facet
-            var reachable_facet_data = getReachableFacetHeader(parent_value_id + '_' + (i+1), "", "", "", minval, maxval,minYear,maxYear);
-            $(reachable_facet_data).insertAfter($(selected_value).parent());
+        if(data.reachability){
+        	//console.log('data reachability? ' + data.reachability);
+            //This code is to enable reachability: comment to eliminate it
+            if(i == data.facetNames.length-1){
+                //TODO:Here we add the search box for looking for a reachable facet
+                var reachable_facet_data = getReachableFacetHeader(parent_value_id + '_' + (i+1), "", "", "", minval, maxval,minYear,maxYear);
+                $(reachable_facet_data).insertAfter($(selected_value).parent());
+            }
         }
-
-        
     }
     
 }

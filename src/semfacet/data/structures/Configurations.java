@@ -47,6 +47,8 @@ public class Configurations {
     @Expose
     private boolean nesting;
     @Expose
+    private boolean reachability_feature;
+    @Expose
     private boolean predicates_browsing_order;
     @Expose
     private boolean aggregates;
@@ -142,6 +144,14 @@ public class Configurations {
 
     public void setBrowsingOrder(boolean predicates_browsing_order) {
         this.predicates_browsing_order = predicates_browsing_order;
+    }
+    
+    public boolean getReachability() {
+        return reachability_feature;
+    }
+    
+    public void setReachability(boolean reachability_feature) {
+        this.reachability_feature = reachability_feature;
     }
     
     public boolean isAggregate() {
