@@ -161,25 +161,38 @@ getSelectedFacetCheckboxIds = function(isSelected, toggledCheckbox) {
     return ids;
 }
 
-getSameLevelFacetValueIds = function(selected_value) {
+
+// Selected values is a list of IDs that are selected
+getSameLevelFacetValueIds = function(selected_value, selected_values) {
     var ids = [];
-    var selected_id = $(selected_value).attr('id');
-    var regex_siblings = "";
-    var temp = selected_id.split("_");
-    var regex_siblings = "";
-    for (var i = 0; i < temp.length - 2; i++) {
-        regex_siblings += temp[i] + "_";
+    
+    console.log('Same level facet value IDS - selected value: ' , selected_value);
+    console.log('Same level facet value IDS - selected values: ' , selected_values);
+    
+    /*
+    for(var i=0; i< selected_values.length; i++){
+    	//var selected_id2 = selected_values[i];
+    	//var selected_id = $(selected_value).attr('id');
+    	var selected_id = selected_values[i];   
+    	console.log('Selected ID2: ', selected_id);
+        var regex_siblings = "";
+        var temp = selected_id.split("_");
+        var regex_siblings = "";
+        for (var i = 0; i < temp.length - 2; i++) {
+            regex_siblings += temp[i] + "_";
+        }
+        regex_siblings = '^' + regex_siblings + '\\d+_\\d+$';
+        var regex = new RegExp(regex_siblings);
+        $('input').each(function() {
+            if ($(this).attr('id').match(regex) && $(this).hasClass('facet_checkbox')) {
+                ids.push(this.id);
+            }
+            if ($(this).attr('id').match(regex) && $(this).hasClass('facet_checkbox_reach')) {
+                ids.push(this.id);
+            }
+        });
     }
-    regex_siblings = '^' + regex_siblings + '\\d+_\\d+$';
-    var regex = new RegExp(regex_siblings);
-    $('input').each(function() {
-        if ($(this).attr('id').match(regex) && $(this).hasClass('facet_checkbox')) {
-            ids.push(this.id);
-        }
-        if ($(this).attr('id').match(regex) && $(this).hasClass('facet_checkbox_reach')) {
-            ids.push(this.id);
-        }
-    });
+    */
     return ids;
 }
 
@@ -860,10 +873,9 @@ getSameLevelFacetNamesJson = function(selected_value, reachable_value) {
     var facetNames = [];
     var selected_id = $(selected_value).attr('id');
     var level = selected_id.split("_").length - 2;
-    console.log('Reachable parameter?', reachable_value);
-    console.log('Level in the selection of the facet Names JSON:', level);
+    //console.log('Reachable parameter?', reachable_value);
+    //console.log('Level in the selection of the facet Names JSON:', level);
     while(level > 0){
-    	console.log('Level in the selection of the facet Names JSON:', level);
         $('.moreLess').each(function() {
             if ($(this).attr("facet_id") != undefined) {
                 if (level == $(this).attr("facet_id").split("_").length && $(selected_value).attr("predicate") != $(this).attr("facet_name")) {
@@ -1067,13 +1079,13 @@ generateDummyCheckboxes = function(selected_value, queryList, selection){
 				var parent = $(selected_value).attr("parent");
 
 				if(selection){
-					console.log("We are creating the dummy checkbox after the parent of the element: " +  "#" + last_id);
+					//console.log("We are creating the dummy checkbox after the parent of the element: " +  "#" + last_id);
 				    $("<ol><li>" + generateDummyCheckboxReachable(last_id+ '_' + 1000+ '_' + i, object, object, type, parent, predicate, ranking) + "</li></ol>").insertAfter(element).hide();
 				    pushCheckboxStack(last_id);
 				}
 				else{
 					var element = $("#"+ last_id+ '_' + 1000+ '_' + i);
-					console.log('remove element ' + last_id+ '_' + 1000+ '_' + i);
+					//console.log('remove element ' + last_id+ '_' + 1000+ '_' + i);
 					//popCheckboxStack(last_id+ '_' + 1000+ '_' + i);
 					element.remove();
 				}
@@ -1089,21 +1101,21 @@ generateDummyCheckboxes = function(selected_value, queryList, selection){
 
 adjustFacetsAfterReachability = function(selected_value) {
     showHideMoreOptions();
-    console.log('checkbox stack: ' + CHECKBOX_STACK);
+    //console.log('checkbox stack: ' + CHECKBOX_STACK);
     var qList = $(selected_value).attr("queryList");
-    console.log('queryList: ' + qList);
+    //console.log('queryList: ' + qList);
     if ($(selected_value).attr("checked")) {
     	
-    	console.log('the facet value ' + $(selected_value).attr('id')+ ' is selected');
+    	//console.log('the facet value ' + $(selected_value).attr('id')+ ' is selected');
     	
     	//Here we have to create dummy checkboxes starting from the queryList
     	last_id = generateDummyCheckboxes(selected_value, qList, true);
     	
 	    pushCheckboxStack($(selected_value).attr('id'));
-	    console.log('last_id: ' + last_id);
-	    console.log('checkbox stack: ' + CHECKBOX_STACK);
+	    //console.log('last_id: ' + last_id);
+	    //console.log('checkbox stack: ' + CHECKBOX_STACK);
         updateNavigationMap();
-        console.log('FOCUS: ' + FOCUS);
+        //console.log('FOCUS: ' + FOCUS);
         if (FOCUS) {
             executeFocusQuery();
         } else {
@@ -1115,18 +1127,17 @@ adjustFacetsAfterReachability = function(selected_value) {
     
     } else {
     	
-    	console.log('the facet value ' + $(selected_value).attr('id')+ ' is unselected');
+    	//console.log('the facet value ' + $(selected_value).attr('id')+ ' is unselected');
     	last_id = generateDummyCheckboxes(selected_value, qList, false);
         popCheckboxStack($(selected_value).attr("id"));
         
-        console.log('checkbox stack: ' + CHECKBOX_STACK);
+        //console.log('checkbox stack: ' + CHECKBOX_STACK);
         
         if ($(selected_value).parent().next().hasClass("facet_div")) {
             cleanExpandedFacets(selected_value);
         }
         $('#'+last_id).remove();
         updateNavigationMap();
-        console.log('empty text area...');
         $('#input_reachable_facetName').val('');
 
         if (FOCUS) {
@@ -1182,14 +1193,19 @@ pushCheckboxStack = function(id) {
 executeHideUnhideFacetValues = function(selected_value, reachable_value) {
     cleanResults();
     $('#preloader').show();
-    var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
+    selectedFacetValueIds = getSelectedFacetValueIds();
+    var selected_facet_values_json = makeJsonFromSelectedValues(selectedFacetValueIds);
     var toggled_value_json = makeJsonFromSelectedValues(selected_value);
-    var same_level_sibling = getSameLevelFacetValueIds(selected_value);
+    
+    //TODO: calculate the values and facet names to update based on all the selected values and 
+    // not only based on the last selected value
+    var same_level_sibling = getSameLevelFacetValueIds(selected_value, selectedFacetValueIds);
     var same_level_sibling_json = makeJsonFromSelectedValues(same_level_sibling);
+    
     //console.log('Reachable value in executeHideUnhide?', reachable_value);
     var same_level_facet_names_json = getSameLevelFacetNamesJson(selected_value, reachable_value);
     
-    //console.log('HideUnhide method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
+    console.log('HideUnhide method: JSON selected values: ' + JSON.stringify(selected_facet_values_json));
 	//console.log('HideUnhide method: JSON same_level_sibling: ' + JSON.stringify(same_level_sibling_json));
 	//console.log('HideUnhide method: JSON same_level_facet_names_json: ' + JSON.stringify(same_level_facet_names_json));
     
@@ -1215,6 +1231,7 @@ executeHideUnhideFacetValues = function(selected_value, reachable_value) {
                 	showHideFacetName(data.facetNames[i].hidden, data.facetNames[i].id);
                $('#preloader').hide();
             } catch (err) {
+            	console.log('Exception catched in HideUnhideFacetValues: ', err);
                 cleanPage();
             }
         }
@@ -1236,10 +1253,13 @@ showHideFacetName = function(hidden, id) {
 showHideValue = function(hidden, id, ranking) {
     var element = $("#" + id).parent().parent();
     var element2 = $("#" + id);
+    
+    //console.log('ID value to show: ' , id);
     if (hidden && !element.hasClass("hideValue") && !element.attr('checked')) {
         element.hide();
         element.addClass("hideValue");
-    } else if (!hidden && element.hasClass("hideValue")){
+    } 
+    else if (!hidden && element.hasClass("hideValue")){
         element.removeClass("hideValue");
         element.show();
         element2.attr("ranking", (element2.attr("ranking")).replace(/[0-9]+/i,ranking));
@@ -1301,10 +1321,11 @@ executeSelectedFacetValueQueryReachability = function(selected_value_id) {
                 if (data.snippets == null || data.snippets.length == 0) {
                     $("#results").html(getEmptyResultMessage());
                 } else {
+                	/*
                 	console.log('data from selection reachability');
                 	for (var i = 0; i < data.snippets.length; i++) {
                 		console.log(data.snippets[i]);
-                	}
+                	}*/
                     generateSnippets(data);
                 }
             } catch (err) {
@@ -1320,6 +1341,9 @@ executeSelectedFacetValueQuery = function(selected_value) {
     $('#preloader').show();
     var selected_facet_values_json = makeJsonFromSelectedValues(getSelectedFacetValueIds());
     var toggled_value_json = makeJsonFromSelectedValues(selected_value);
+    
+    console.log('Selected facet value json: ', JSON.stringify(selected_facet_values_json));
+    
      
     if (selected_facet_values_json.length < 1) {
         getMainCategories();
@@ -1336,13 +1360,19 @@ executeSelectedFacetValueQuery = function(selected_value) {
                 if (data.snippets == null || data.snippets.length == 0) {
                     $("#results").html(getEmptyResultMessage());
                 } else {
-                	console.log(JSON.stringify(data));
+                	//console.log(JSON.stringify(data));
+                	/*
+                	console.log('data from selection reachability');
+                	for (var i = 0; i < data.snippets.length; i++) {
+                		console.log(data.snippets[i]);
+                	}*/
                     generateSnippets(data);
                     generateNestedFacetNames(data, selected_value);
                     //TODO: we have also to update the counters in the facet values of the response
                     // we have to use the Stack CHECKBOX_STACK
                 }
             } catch (err) {
+            	console.log('Exception catched: ', err);
                 cleanPage();
             }
         });
