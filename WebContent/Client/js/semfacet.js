@@ -169,11 +169,11 @@ getSameLevelFacetValueIds = function(selected_value, selected_values) {
     console.log('Same level facet value IDS - selected value: ' , selected_value);
     console.log('Same level facet value IDS - selected values: ' , selected_values);
     
-    /*
-    for(var i=0; i< selected_values.length; i++){
+    
+    for(var j=0; j< selected_values.length; j++){
     	//var selected_id2 = selected_values[i];
     	//var selected_id = $(selected_value).attr('id');
-    	var selected_id = selected_values[i];   
+    	var selected_id = selected_values[j];   
     	console.log('Selected ID2: ', selected_id);
         var regex_siblings = "";
         var temp = selected_id.split("_");
@@ -192,7 +192,7 @@ getSameLevelFacetValueIds = function(selected_value, selected_values) {
             }
         });
     }
-    */
+    
     return ids;
 }
 
