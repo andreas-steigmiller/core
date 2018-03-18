@@ -19,7 +19,7 @@ public class BasicSetCoverSolver
             List<T> listOfSets)
     {
         final int size = listOfSets.size();
-        if (size > 20)
+        if (size > 50)
             throw new IllegalArgumentException("Too many combinations");
         
         // All the possible subset of a set: 2^size of the set. In this case

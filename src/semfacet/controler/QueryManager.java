@@ -18,6 +18,8 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import greedy.Report;
+
 import org.apache.log4j.Logger;
 
 import semfacet.cuncurrency.RelevantFacetName;
@@ -241,19 +243,27 @@ public class QueryManager {
     
     
     
-    // necessary for other baselines
+    /*
+     *  If we have the evaluation mode, we have to rank the facet names according to:
+     *  1. Basic Set Cover algorithm for the diversified predicates
+     *  2. Greedy approaches of Set Cover algorithm for the diversified predicates
+     *  3. Oxford getDiversifiedPredicates
+     *  4. Introduce reachability (config.isBrowsingOrder()) with depth MAX_INTEGER
+     *  5. Introduce reachability (config.isBrowsingOrder()) with depth d
+     */
+    
 
     
-  
     public static Response getInitialFacetNames(List<String> queryList, String searchKeywords, 
-    		Configurations config) {
+    		Configurations config, boolean evaluation, int max_depth) {
     	Response answer = new Response();
         Set<String> retrievedIds = new HashSet<String>(QueryManager.getIdsFromFacets(config, queryList));
         Set<String> keywordSearchIds = new HashSet<String>(getIdsFromKeywordSearch(searchKeywords, config));
         retrievedIds = Sets.intersection(retrievedIds, keywordSearchIds);
         
-        List<FacetName> facetNames = getFacetNamesHybridAlg(null, queryList, retrievedIds, config);
+        List<FacetName> facetNames = getFacetNamesHybridAlg(null, queryList, retrievedIds, config, max_depth);
         
+        List<Set<String>> answerSets = new ArrayList<Set<String>>();
         
         Map<String, FacetName> facetTypeMap = config.getFacetTypeMap();
         Map<String, String> idLabelMap = config.getIdLabelMap();
@@ -266,21 +276,36 @@ public class QueryManager {
             fn.setNumberOfNumerics(facetTypeMap.get(fn.getName()).getNumberOfNumerics());
             fn.setSliderDateTimeMaxValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMaxValue());
             fn.setSliderDateTimeMinValue(facetTypeMap.get(fn.getName()).getSliderDateTimeMinValue());
+            
+            LOG.info("nesting score of facet name: " + fn.getName() +": "+ fn.getRanking());
                
-            //We remove this line for the evaluation without equal-size            
+            //In this phase getRanking returns the nesting score of each facet name 
             if(retrievedIds.size() > 1 && config.isBrowsingOrder())
             	fn.setRanking( fn.getRanking()* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
             
-            // in case in which we consider depth=1
-            //fn.setRanking( 1* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
-            
-            
-          
+            answerSets.add(fn.getAnswerSet());
         }
+        
+        
+        LOG.info("Current results: " + retrievedIds);
+        for (Set<String> as : answerSets)
+        	LOG.info("Answer set: " + as);
+        if (evaluation){
+        	Report.getGreedyAlgorithms(retrievedIds, answerSets);
+        }
+        
+        
+        
+        
+        
         
         if(config.isBrowsingOrder()){
         	Ranking.sortFacetNamesByRank(facetNames);
+        	double start = System.currentTimeMillis();
             List<FacetName> facetNames2 = getDiversifiedPredicates(facetNames, retrievedIds, K_TOP_PREDICATES, THRESHOLD_INTERSECTION);        
+            double end = System.currentTimeMillis();
+            LOG.info("Time diversified predicates (ms): " + (end-start));
+            
             answer.setSize(retrievedIds.size());
             answer.setFacetNames(facetNames2);
         }
@@ -416,7 +441,8 @@ public class QueryManager {
     }
     
     
-    public static Response getDataForSelectedValue(FacetValue toggledFacetValue, String searchKeywords, List<String> queryList, Configurations config) {
+    public static Response getDataForSelectedValue(FacetValue toggledFacetValue, String searchKeywords, 
+    		List<String> queryList, Configurations config, int max_depth) {
         Response answer = new Response();
         Set<String> retrievedIds = getIdsFromFacets(config, queryList);
         List<String> keywordSearchIds = getIdsFromKeywordSearch(searchKeywords, config);
@@ -429,7 +455,7 @@ public class QueryManager {
 
         //Here the nested facet names
         if (config.isNesting() && toggledFacetValue.getType().equals(FacetValueEnum.CLASS.toString()))
-            relevantFacetNames = getFacetNamesHybridAlg(toggledFacetValue, queryList, retrievedIds, config);
+            relevantFacetNames = getFacetNamesHybridAlg(toggledFacetValue, queryList, retrievedIds, config,max_depth);
         
         List<String> idsForPage = getIdsForPage(0, new ArrayList<String>(retrievedIds));
         List<Snippet> snippets = getSnippets(idsForPage, config);
@@ -929,7 +955,7 @@ public class QueryManager {
     }
 
     private static List<FacetName> getFacetNamesHybridAlg(FacetValue toggledFacetValue, List<String> queryList, Set<String> retrievedIds,
-            Configurations config) {
+            Configurations config, int max_depth) {
         //List<String> initialIds = new ArrayList<String>(retrievedIds);
         List<FacetName> relevantFacetNames;
         Set<String> allFacetNames;
@@ -939,7 +965,7 @@ public class QueryManager {
         else
             allFacetNames = QueryExecutor.getPredicatesFromStore(queryList, config);
         
-        relevantFacetNames = getFacetNamesMinimizeAlg(toggledFacetValue, queryList, retrievedIds, config, allFacetNames);
+        relevantFacetNames = getFacetNamesMinimizeAlg(toggledFacetValue, queryList, retrievedIds, config, allFacetNames, max_depth);
 
         return relevantFacetNames;
     }
@@ -948,8 +974,14 @@ public class QueryManager {
     
     
     //new version: multithreading integration
+    /*
+     * This methods allows to get the facet names in the facetes interface.
+     * The RelevantFacetName thread allows to calculate the nesting feature of each facet name
+     * and this nesting depth is stored in the ranking attributed of the FacetName
+     * @return List<FacetName> where each facet predicate has the nesting score associated
+     */
     public static List<FacetName> getFacetNamesMinimizeAlg(FacetValue toggledFacetValue, List<String> queryList, Set<String> retrievedIds,
-            Configurations config, Set<String> allFacetNames) {
+            Configurations config, Set<String> allFacetNames, int max_depth) {
         
     	List<FacetName> relevantFacetNames = new ArrayList<FacetName>();
         List<String> allNames = new ArrayList<String>(allFacetNames);
@@ -969,7 +1001,7 @@ public class QueryManager {
         }
         
         for(List<String> list : matrixNames){
-        	Runnable r = new RelevantFacetName(toggledFacetValue, list, relevantFacetNames, retrievedIds, queryList, config);
+        	Runnable r = new RelevantFacetName(toggledFacetValue, list, relevantFacetNames, retrievedIds, queryList, config, max_depth);
         	Thread t = new Thread(r);
         	threads.add(t);
         	t.start();

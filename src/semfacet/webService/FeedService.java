@@ -60,6 +60,9 @@ public class FeedService {
     ServletContext context;
 
     static Logger LOG = Logger.getLogger(FeedService.class.getName());
+    
+    static boolean evaluation = true; 
+    static int MAX_DEPTH = 1;
 
     /**
      * This method returns an initial facet and snippets based on the multiple
@@ -128,7 +131,7 @@ public class FeedService {
         queryList = newQueryList;
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
-        Response result = QueryManager.getInitialFacetNames(queryList, searchKeywords, config);
+        Response result = QueryManager.getInitialFacetNames(queryList, searchKeywords, config, evaluation, MAX_DEPTH);
         Gson gson = new Gson();
         return gson.toJson(result);
     }
@@ -286,7 +289,7 @@ public class FeedService {
         FacetQueryConstructionManager.appendSliderQueries(queryList, sliders);
         FacetQueryConstructionManager.appendDateTimeQueries(queryList, datetimesliders);
         FacetValue selectedFacetValue = ClientDataManager.getFacetValueFromId(toggledValueId, values);
-        Response result = QueryManager.getDataForSelectedValue(selectedFacetValue, searchKeywords, queryList, config);
+        Response result = QueryManager.getDataForSelectedValue(selectedFacetValue, searchKeywords, queryList, config, MAX_DEPTH);
         Utils.logUserActivity(searchKeywords, config, selectedFacetValue);
         Gson gson = new Gson();
         

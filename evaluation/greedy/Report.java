@@ -8,51 +8,51 @@ import java.util.Set;
 
 import basic.BasicSetCoverSolver;
 import basic.BasicSetCoverSolver.Filter;
+import semfacet.data.structures.FacetName;
 
 import java.io.*;
 
-public class Pro5_ammachef {
+public class Report {
 	
 	
-	public static void main(String[] args) throws IOException {
+	public static void printReportSetCover(){
+		
+	}
+	
+	
+	/**
+	 * This method calculate the diversification of the facets according 
+	 * to the greedy approach of the SetCover algorithm.
+	 * The three approaches are computed automatically and a report is shown.
+	 */
+	public static void getGreedyAlgorithms(Set<String> totalElements, List<Set<String>> listOfSets){
 		SCPModel<String> model = null;
 		GreedyCoverageSolver CoverageMethod = new GreedyCoverageSolver();
 		GreedyCostSolver CostMethod = new GreedyCostSolver();
 		ChvatalSolver ChvatalMethod = new ChvatalSolver();
 		double alpha = 1;
 		
-		
-	
-		//Integer[] solution = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
-		//Integer[][] arrayOfSets = { { 1 },{ 2 }, {1,2,3}, {1,5,7,8,9,11,12, 18}, { 3, 8 }, { 9, 10 }, { 17 }, { 10 },
-        //        { 2, 3, 19 }, { 4, 5 }, {20}, { 5, 7, 20 }, { 5, 6, 16, 20 }, { 4, 7, 15, 20 }, { 6, 7 },
-        //        { 8, 9, 13, 14, 15 }, {1,5,10,15,20}, {3,4,5,6,7,8} };
-        
-        List<Set<String>> listOfSets = new ArrayList<Set<String>>();
-        
-        String[] solution2 = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l" };
-		String[][] arrayOfSets2 = { { "a" },{ "b" }, {"a", "d", "e"}, {"a","e","g","j", "k","l"}, { "c", "k" }, 
-				{  "c", "b", }, { "b" }, { "j" }, { "j", "k", "l" } };
-        
-        for (String[] array : arrayOfSets2)
-            listOfSets.add(new LinkedHashSet<String>(Arrays.asList(array)));
-        final Set<String> solutionSet = new LinkedHashSet<String>(Arrays.asList(solution2));
-        
-        
-        Filter<Set<Set<String>>> filter = new Filter<Set<Set<String>>>()
+		Filter<Set<Set<String>>> filter = new Filter<Set<Set<String>>>()
         {
             public boolean matches(Set<Set<String>> elements)
             {
                 Set<String> union = new LinkedHashSet<String>();
                 for (Set<String> ints : elements)
                     union.addAll(ints);
-                return union.equals(solutionSet);
+                return union.equals(totalElements);
             }
         };
-        Set<Set<String>> firstSolution = BasicSetCoverSolver.solveSetCover(filter,listOfSets);
-        System.out.println("The shortest combination was " + firstSolution);
+        
 		
         model = getModelData(listOfSets);
+        System.out.println("\n" + model);
+        
+        double start = System.currentTimeMillis();        
+        Set<Set<String>> firstSolution = BasicSetCoverSolver.solveSetCover(filter,listOfSets);
+        System.out.println("The basic set cover algorithm returns: " + firstSolution);
+        double end = System.currentTimeMillis();
+        System.out.println("\n" + "Time basic set cover algorithm (ms): " + (end-start));
+        
         
         CoverageMethod.reset();
 		CostMethod.reset();
@@ -61,20 +61,20 @@ public class Pro5_ammachef {
 		setMinCoverage(alpha, CoverageMethod, CostMethod, ChvatalMethod);
 		CoverageMethod.setModel(model);
 		CoverageMethod.solve();
-		CoverageMethod.print();
+		//CoverageMethod.print();
 
 		CostMethod.setModel(model);
 		CostMethod.solve();
-		CostMethod.print();
+		//CostMethod.print();
 
 		ChvatalMethod.setModel(model);
 		ChvatalMethod.solve();
-		ChvatalMethod.print();
+		//ChvatalMethod.print();
 		
 		printComparison(alpha, CoverageMethod, CostMethod, ChvatalMethod);
-
+		
 	}
-	
+		
 	// building sets, each of cost 1 hardcoded
 	public static SCPModel<String> getModelData(List<Set<String>> listOfSets) {
 		SCPModel<String> scpmodel = new SCPModel<String>();
@@ -82,10 +82,7 @@ public class Pro5_ammachef {
 		for (int i=0; i< listOfSets.size(); i++){
 			Set<String> setElements = listOfSets.get(i);
 			scpmodel.addElementSet(i, 1, setElements);
-		}
-		
-		System.out.println("\n" + scpmodel);
-		
+		}	
 		return scpmodel;
 	}
 

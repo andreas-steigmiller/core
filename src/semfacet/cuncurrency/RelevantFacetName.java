@@ -28,19 +28,24 @@ public class RelevantFacetName implements Runnable{
 	private Set<String> retrievedIds;
 	private Configurations config;
 	private List<String> queryList;
+	private int max_depth;
+	
 	public static int MAX_DEPTH = 2;
+	
+	
 	public static int RESULT_THRESHOLD = 1;
 	public static int NESTED_THRESHOLD = 5;
 
 	
 	public RelevantFacetName(FacetValue toggledFacetValue, List<String> namesToCheck,List<FacetName> relevantFacetNames,
-			Set<String> retrievedIds, List<String> queryList, Configurations config){
+			Set<String> retrievedIds, List<String> queryList, Configurations config, int max_depth){
 		this.toggledFacetValue = toggledFacetValue;
 		this.namesToCheck = namesToCheck;
 		this.relevantFacetNames = relevantFacetNames;
 		this.retrievedIds = retrievedIds;
 		this.queryList = queryList;
 		this.config = config;
+		this.max_depth = max_depth;
 	}
 	
 	
@@ -97,7 +102,7 @@ public class RelevantFacetName implements Runnable{
             	fn.setAnswerSet(answerSet);
             	
             	if(config.isBrowsingOrder()){
-                	fn.setRanking(computeH(fn, fn.getAnswerSet().hashCode(), fn.getAnswerSet().size(), queryList, MAX_DEPTH,0));
+                	fn.setRanking(computeH(fn, fn.getAnswerSet().hashCode(), fn.getAnswerSet().size(), queryList, max_depth,0));
             	}
             	
                 relevantFacetNames.add(fn);
@@ -132,7 +137,7 @@ public class RelevantFacetName implements Runnable{
 			String newObject = "?zz";
 			String filters = newPredicate +" !=  <" + config.getCategoryPredicate() + ">";
 			// We consider 'z' because is the variable used in checkRelevantFacetNames method
-			for(int i=0; i<MAX_DEPTH-d; i++){
+			for(int i=0; i<max_depth-d; i++){
 				newSubject += "z";
 				newPredicate += "y";
 				newObject += "z";
