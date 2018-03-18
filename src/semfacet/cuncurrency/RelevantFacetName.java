@@ -96,7 +96,7 @@ public class RelevantFacetName implements Runnable{
             	FacetName fn = new FacetName(name);
             	fn.setAnswerSet(answerSet);
             	
-            	if(config.isBrowsingOrder() || QueryManager.linearCombination){
+            	if(config.isBrowsingOrder()){
                 	fn.setRanking(computeH(fn, fn.getAnswerSet().hashCode(), fn.getAnswerSet().size(), queryList, MAX_DEPTH,0));
             	}
             	

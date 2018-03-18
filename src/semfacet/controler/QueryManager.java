@@ -242,17 +242,11 @@ public class QueryManager {
     
     
     // necessary for other baselines
-    public static boolean countBased = false;
-    public static boolean maxBased = false;
+
     
-    public static boolean linearCombination = false;
-    public static double alfa = 1.0;
-    public static double beta = 1.0;
-    public static double gamma = 1.0;
-    
-    
-    
-    public static Response getInitialFacetNames(List<String> queryList, String searchKeywords, Configurations config) {
+  
+    public static Response getInitialFacetNames(List<String> queryList, String searchKeywords, 
+    		Configurations config) {
     	Response answer = new Response();
         Set<String> retrievedIds = new HashSet<String>(QueryManager.getIdsFromFacets(config, queryList));
         Set<String> keywordSearchIds = new HashSet<String>(getIdsFromKeywordSearch(searchKeywords, config));
@@ -281,20 +275,7 @@ public class QueryManager {
             //fn.setRanking( 1* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
             
             
-            //For the evaluation with other baselines
-            if(countBased){
-            	//LOG.info("answer set of facet: " + fn.getName() + " --> "+ fn.getAnswerSet());
-            	fn.setRanking(fn.getAnswerSet().size());
-            }
-            
-            else if(linearCombination){
-            	double depth = fn.getRanking();
-            	double sel = 1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size());
-            	
-            	//the problem is that the value of 'overlap' depends on the ordering
-            	double overlap = 0;
-            	fn.setRanking(alfa*sel + gamma*depth);
-            }
+          
         }
         
         if(config.isBrowsingOrder()){
@@ -302,17 +283,6 @@ public class QueryManager {
             List<FacetName> facetNames2 = getDiversifiedPredicates(facetNames, retrievedIds, K_TOP_PREDICATES, THRESHOLD_INTERSECTION);        
             answer.setSize(retrievedIds.size());
             answer.setFacetNames(facetNames2);
-        }
-        else if(linearCombination){
-        	Ranking.sortFacetNamesByRank(facetNames);
-            List<FacetName> facetNames2 = getDiversifiedPredicatesLinearCombination(facetNames, retrievedIds, K_TOP_PREDICATES, THRESHOLD_INTERSECTION, beta);        
-            answer.setSize(retrievedIds.size());
-            answer.setFacetNames(facetNames2);
-        }
-        else if(countBased){
-        	Ranking.sortFacetNamesByRank(facetNames);
-        	answer.setSize(retrievedIds.size());
-            answer.setFacetNames(facetNames);
         }
         else{
         	Ranking.sortFacetNamesAlphabetically(facetNames, true);
@@ -390,9 +360,7 @@ public class QueryManager {
     	List<FacetName> temp = new ArrayList<FacetName>();
     	Set<String> uncovered = new HashSet<String>(retrievedIds);
     	
-    	
     	for(FacetName predicate : predicates){
-    		
     		Set<String> answerSet =predicate.getAnswerSet();
     		int sizeAnswerSet = answerSet.size();
     		
@@ -481,15 +449,6 @@ public class QueryManager {
             
             if(retrievedIds.size() > 1 && config.isBrowsingOrder())
             	fn.setRanking( fn.getRanking()* (1.0 -  Math.log((double)fn.getAnswerSet().size()) / Math.log((double)retrievedIds.size()) ) );
-            
-            
-            //For the evaluation with other baselines
-            if(countBased){
-            	LOG.info("answer set of facet: " + fn.getName() + " --> "+ fn.getAnswerSet());
-            	fn.setRanking(fn.getAnswerSet().size());
-            	
-            }            
-        
         }
         
         
@@ -506,9 +465,7 @@ public class QueryManager {
             answer.setFacetNames(relevantFacetNames);
         }
         
-        
-        
-        
+ 
         answer.setSnippets(snippets);
         return answer;
     }
